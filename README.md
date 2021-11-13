@@ -1,10 +1,12 @@
 # Numerical Physics Project
 Armelle Célarier, Antoine Combret--Renouard
 
+
+
 This repository host the project of Armelle & Antoine for their Numerical Physics course (PHY571).
 The repository was created by Armelle, and the first files were added by Antoine from the GitHub website. It was cloned to Antoine's MacBook Air using his terminal.
 
-This nice video (https://www.youtube.com/watch?v=yXT1ElMEkW8) explains how to clone a repo (+ some help with SSH, etc...)
+This nice video (https://www.youtube.com/watch?v=yXT1ElMEkW8) explains how to clone a repo.
 
 
 Files description :
