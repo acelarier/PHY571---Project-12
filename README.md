@@ -3,11 +3,13 @@ pour tester
 
 
 
-voici la première ligne que j'ai écrit dans ce README
+voici la premiÃ¨re ligne que j'ai Ã©crit dans ce README
 
 
-voici la deuxième ligne, proposée dans 'dev'
+voici la deuxiÃ¨me ligne, proposÃ©e dans 'dev'
 
 
 
-troisi�me ligne !!
+troisième ligne !!
+
+quatrième ligne écrite sur safari
