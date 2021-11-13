@@ -13,3 +13,4 @@ Files description :
 - README.md (this file)         project's description
 - UI.py                         contains display functions
 - PHY571_Projet_Final.ipynb     Jupyter Notebook with the majority of the code
+- modelling.py                  copy the classes of the notebook on a .py file
