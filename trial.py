@@ -5,11 +5,11 @@ file used to run functions
 """
 
 numberParticles = 300
-boxSize = 7
-etaNoise = 2
+boxSize = 25
+etaNoise = 0.1
 speed = 0.03
 
-numberTimeStep = 100
+numberTimeStep = 1000
 
 
 
@@ -21,8 +21,8 @@ print('Simulation créée')
 sim.initialise() # initialize a random configuration
 print('Simulation initialisée. Calcul évolution...')
 
+
 data, metadata = sim.run(numberTimeStep)
-print('Calcul terminé. Affchage...')
+print('Calcul terminé. Affichage...')
 
-displayPoints(data, metadata)
-
+displayLines(data, metadata)
