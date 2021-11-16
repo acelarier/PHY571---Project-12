@@ -8,6 +8,7 @@ formating :
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation, rc
+import matplotlib.patches as patches
 
 
 
@@ -36,7 +37,7 @@ def fromFile() :
     return data
 
 
-def display(data) :
+def displayLines(data) :
     n_step, n_part = np.shape(data)[0:2]
 
     plt.close('all')
@@ -53,3 +54,40 @@ def display(data) :
 
     ani = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=200)
     plt.show()
+
+def displayPoints(data) :
+    n_step, n_part = np.shape(data)[0:2]
+
+    plt.close('all')
+    fig, ax = plt.subplots()
+    for i in range(5) :
+        for p in range(n_part) :
+            dot = patches.Circle(data[i,p,0:2], 0.01)
+            ax.add_patch(dot)
+    ax.set_xlim(-.1,1.1)
+    ax.set_ylim(-.1,1.1)
+
+    def frame(i):
+        start=max((i-5,0))
+        for p in range(n_part) :
+            ax.patches.pop(0)
+            dot = patches.Circle(data[i,p,0:2], 0.01)
+            ax.add_patch(dot)
+        return lines
+
+    ani = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=200)
+    plt.show()
+
+
+
+
+""" usefull for later
+
+from matplotlib.widgets import Button
+
+def reset(event):
+    '''what to do here'''
+    ax.clear()
+
+button.on_clicked(reset)
+"""
