@@ -48,13 +48,13 @@ class Simulation:
 
     def __init__(self, numberParticles, interactionRadius, boxSize, noise, speed):
         self.N = numberParticles
-        self.R = interactionRadius
+        self.R = 1 #self.R = interactionRadius
         self.L = boxSize
         self.eta = noise
         self.speed = speed
         self.particles = list()
 
-    def initRandom(self) :
+    def initialise(self) :
         for i in range(self.N) :
             self.particles.append(particle(np.array([random.uniform(0,self.L), random.uniform(0,self.L)]), self.speed, random.uniform(0,2*np.pi), self.eta, self.L))
 
@@ -76,6 +76,7 @@ class Simulation:
 
     def run(self, n_step) :
         """data format : np.array, shape = (n_step, n_part, 3) --> [time, particule ID, coordinates]
+                         + an array containing meta data : [L]
            runs a simulation of n_step and return a numpy array formatted as above"""
         data = np.zeros((n_step, self.N, 3))
 
@@ -87,7 +88,10 @@ class Simulation:
             for p in range(1,self.N) :
                 data[t,p,0:2] = self.particles[p].pos
                 data[t,p,2] = self.particles[p].theta
-        return data
+
+        metadata = np.array([self.L])
+
+        return data, metadata
 
 
 

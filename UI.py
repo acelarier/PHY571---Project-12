@@ -44,42 +44,48 @@ def stop(event):
     return
 
 
-def displayLines(data) :
+def displayLines(data, metadata) :
+    """displays a run with the five last positions with a line, for each particle (problems with periodic boundary)"""
     n_step, n_part = np.shape(data)[0:2]
 
     plt.close('all')
     fig, ax = plt.subplots()
     lines = [ax.plot(data[0,i,0], data[0,i,1], linewidth = 0.3, color='r')[0] for i in range(n_part)]
-    ax.set_xlim(-.1,1.1)
-    ax.set_ylim(-.1,1.1)
+
+    L = metadata[0]
+    ax.set_xlim(0,L)
+    ax.set_ylim(0,L)
 
     anim = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=20)
     plt.show()
 
 
-def displayPoints(data) :
+def displayPoints(data, metadata) :
+    """displays a run with the five last positions as dots, for each particle"""
     n_step, n_part = np.shape(data)[0:2]
 
     plt.close('all')
     fig, ax = plt.subplots()
-    for t in range(5) :
+    L = metadata[0]
+    ax.set_xlim(0,L)
+    ax.set_ylim(0,L)
+
+    trace = 20
+
+    for t in range(trace) :
         for p in range(n_part) :
-            dot = patches.Circle(data[t,p,0:2], 0.005, color='b')
+            dot = patches.Circle(data[t,p,0:2], L/400.)
             ax.add_patch(dot)
-    ax.set_xlim(-.1,1.1)
-    ax.set_ylim(-.1,1.1)
 
     def frame(t):
-        start=max((t-5,0))
+        start=max((t-trace,0))
         for p in range(n_part) :
             ax.patches.pop(0)
-            dot = patches.Circle(data[t,p,0:2], 0.01)
+            dot = patches.Circle(data[t,p,0:2], L/400.)
             ax.add_patch(dot)
         return ax
 
     anim = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=20)
-
-
 
     plt.show()
 
