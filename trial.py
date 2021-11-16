@@ -4,10 +4,10 @@ file used to run functions
 !!! needs to execute modelling.py and UI.py before !!!
 """
 
-numberParticles = 300
-boxSize = 7
+numberParticles = 30
+boxSize = 1
 etaNoise = 2
-speed = 0.03
+speed = 0.003
 
 numberTimeStep = 100
 

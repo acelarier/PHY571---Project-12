@@ -67,18 +67,24 @@ def stop(event):
 
 
 def displayLines(data, metadata) :
-    """displays a run with the five last positions with a line, for each particle (problems with periodic boundary)"""
     n_step, n_part = np.shape(data)[0:2]
+
+    trace = 20
 
     plt.close('all')
     fig, ax = plt.subplots()
-    lines = [ax.plot(data[0,i,0], data[0,i,1], linewidth = 0.3, color='r')[0] for i in range(n_part)]
-
-    L = metadata[0]
+    lines = [ax.plot(data[0,p,0], data[0,p,1], linewidth = 0.5, color='r')[0] for p in range(n_part)]
+    L = metadata[1]
     ax.set_xlim(0,L)
     ax.set_ylim(0,L)
 
-    anim = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=20)
+    def frame(t):
+        start=max((t-trace,0))
+        for p in range(n_part) :
+            lines[p].set_data(data[start:t,p,0],data[start:t,p,1])
+        return lines
+
+    ani = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=200)
     plt.show()
 
 
@@ -95,7 +101,7 @@ def displayPoints(data, metadata) :
     trace = 20
 
     for p in range(n_part) :
-        dot = patches.Circle(data[t,p,0:2], L/400.)
+        dot = patches.Circle(data[0,p,0:2], L/100.)
         ax.add_patch(dot)
 
     def frame(t):
