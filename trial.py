@@ -21,10 +21,8 @@ print('Simulation créée')
 sim.initialise() # initialize a random configuration
 print('Simulation initialisée. Calcul évolution...')
 
+
 data, metadata = sim.run(numberTimeStep)
 print('Calcul terminé. Affichage...')
 
 displayLines(data, metadata)
-
-
-

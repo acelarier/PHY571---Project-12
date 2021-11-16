@@ -1,4 +1,6 @@
-# Numerical Physics Project
+# Bird flocking and swarm inteligence
+Numerical Physics Project
+
 Armelle Célarier, Antoine Combret--Renouard
 
 
