@@ -10,7 +10,7 @@ print('Simulation créée')
 sim.initialise() # initialize a random configuration
 print('Simulation initialisée. Calcul évolution...')
 
-data, metadata = sim.run(100)
+data, metadata = sim.run(1000)
 print('Calcul terminé. Affchage...')
 
 displayPoints(data, metadata)
