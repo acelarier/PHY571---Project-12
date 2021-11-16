@@ -14,3 +14,4 @@ Files description :
 - UI.py                         contains display functions
 - PHY571_Projet_Final.ipynb     Jupyter Notebook with the majority of the code
 - modelling.py                  copy the classes of the notebook on a .py file
+- trial.py                            file from where the sim are run (= main)
