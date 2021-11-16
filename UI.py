@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib import animation, rc
 import matplotlib.patches as patches
 from matplotlib.widgets import Button
+import os
 
 
 
@@ -27,13 +28,17 @@ def genData() :
 
 
 def toFile(data) :
-    path = str(input(prompt = 'Enter the directory where you want to save the data'))
+    current = os.getcwd()
+    print('Current directory : ' + current)
+    path = str(input('Enter the directory where you want to save the data :'))
     np.save(path, data)
     print('Simulation results saved to ' + path)
     return
 
 def fromFile() :
-    path = str(input(prompt = 'Enter the complete filename you want to import'))
+    current = os.getcwd()
+    print('Current directory : ' + current)
+    path = str(input('Enter the complete filename you want to import :'))
     data = np.load(path)
     return data
 
@@ -66,7 +71,7 @@ def displayPoints(data, metadata) :
 
     plt.close('all')
     fig, ax = plt.subplots()
-    L = metadata[0]
+    L = metadata[1]
     ax.set_xlim(0,L)
     ax.set_ylim(0,L)
 
