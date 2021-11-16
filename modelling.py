@@ -54,7 +54,7 @@ class Simulation:
         self.speed = speed
         self.particles = list()
 
-    def initialisation(self) :
+    def initRandom(self) :
         for i in range(self.N) :
             self.particles.append(particle(np.array([random.uniform(0,self.L), random.uniform(0,self.L)]), self.speed, random.uniform(0,2*np.pi), self.eta, self.L))
 
@@ -66,13 +66,28 @@ class Simulation:
             if distance <= self.R :
                 neighbors.append(particle_i)
         return neighbors
-    
-    def update(self):
+
+    def doStep(self):
         for i in range(self.N):
             neighbors = self.getNeighbors(self.particles[i])
             self.particles[i].updateOrientation(neighbors)
         for i in range(self.N):
             self.particles[i].updatePosition()
+
+    def run(self, n_step) :
+        """data format : np.array, shape = (n_step, n_part, 3) --> [time, particule ID, coordinates]
+           runs a simulation of n_step and return a numpy array formatted as above"""
+        data = np.zeros((n_step, self.N, 3))
+
+        for p in range(1,self.N) :
+            data[0,0,0:2] = self.particles[p].pos
+            data[0,0,2] = self.particles[p].theta
+        for t in range(1,n_step) :
+            self.doStep()
+            for p in range(1,self.N) :
+                data[t,p,0:2] = self.particles[p].pos
+                data[t,p,2] = self.particles[p].theta
+        return data
 
 
 

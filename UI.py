@@ -1,6 +1,6 @@
 """
 shows the animation corresponding to a sim data set
-formating : 
+formating :
     np.array, shape = (n_step, n_part, 3) --> [time, particule ID, coordinates]
     coordinates --> [x, y, theta]
 """
@@ -24,27 +24,32 @@ def genData() :
     return data
 
 
+def toFile(data) :
+    path = str(input(prompt = 'Enter the directory where you want to save the data'))
+    np.save(path, data)
+    print('Simulation results saved to ' + path)
+    return
+
+def fromFile() :
+    path = str(input(prompt = 'Enter the complete filename you want to import'))
+    data = np.load(path)
+    return data
 
 
-
-def display(file) :
-    if isinstance(file, str) :
-        data = np.load(file)
-    else : data = file
-    
+def display(data) :
     n_step, n_part = np.shape(data)[0:2]
-    
+
     plt.close('all')
     fig, ax = plt.subplots()
     lines = [ax.plot(data[0,i,0], data[0,i,1], linewidth = 0.3, color='r')[0] for i in range(n_part)]
     ax.set_xlim(-.1,1.1)
     ax.set_ylim(-.1,1.1)
-    
+
     def frame(i):
         start=max((i-5,0))
         for p in range(n_part) :
             lines[p].set_data(data[start:i,p,0],data[start:i,p,1])
         return lines
-    
+
     ani = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=200)
     plt.show()
