@@ -48,7 +48,7 @@ class Simulation:
 
     def __init__(self, numberParticles, interactionRadius, boxSize, noise, speed):
         self.N = numberParticles
-        self.R = 1 #self.R = interactionRadius
+        self.R = interactionRadius
         self.L = boxSize
         self.eta = noise
         self.speed = speed
