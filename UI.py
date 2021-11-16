@@ -27,20 +27,37 @@ def genData() :
     return data
 
 
-def toFile(data) :
+def toFile(data, metadata) :
+    """saves the results of a trial as .npy files :
+    data     --> path + '_data'
+    metadata --> path + '_metadata'"""
+
     current = os.getcwd()
     print('Current directory : ' + current)
-    path = str(input('Enter the directory where you want to save the data :'))
-    np.save(path, data)
-    print('Simulation results saved to ' + path)
+    path = str(input('\nEnter path+filename : '))
+
+    np.save(path + '_data', data)
+    np.save(path + '_metadata', metadata)
+
+    print('\nSimulation results saved as :\n' + path + '_data.npy\n' + path + '_metadata.npy' )
     return
 
 def fromFile() :
+    """loads the results of a trial as numpy arrays
+ex : for two files named
+    monday_sim_1_data.npy
+    monday_sim_1_metadata.npy
+then only write path + 'monday_sim_1' as an input
+!!! don't write '.npy' !!!"""
     current = os.getcwd()
     print('Current directory : ' + current)
-    path = str(input('Enter the complete filename you want to import :'))
-    data = np.load(path)
-    return data
+    path = str(input('\nEnter path+filename : '))
+
+    data = np.load(path + '_data.npy')
+    metadata = np.load(path + '_metadata.npy')
+
+    print('\nLoaded from :\n' + path + '_data.npy\n' + path + '_metadata.npy' )
+    return data, metadata
 
 def stop(event):
     global anim
@@ -77,10 +94,9 @@ def displayPoints(data, metadata) :
 
     trace = 20
 
-    for t in range(trace) :
-        for p in range(n_part) :
-            dot = patches.Circle(data[t,p,0:2], L/400.)
-            ax.add_patch(dot)
+    for p in range(n_part) :
+        dot = patches.Circle(data[t,p,0:2], L/400.)
+        ax.add_patch(dot)
 
     def frame(t):
         start=max((t-trace,0))

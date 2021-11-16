@@ -8,3 +8,9 @@ the figure shows four frame where showing four pools of particules evoluting acc
 (d) L = 5 , eta = 0.1
 
 with, for all trial we have N = 300 and v = 0.03
+
+
+
+sim_b = results for (b)
+sim_c ... ... ... . (c)
+sim_d ... ... ... . (d)
