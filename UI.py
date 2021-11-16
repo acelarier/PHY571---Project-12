@@ -99,13 +99,13 @@ def displayPoints(data, metadata) :
     ax.set_ylim(0,L)
 
     trace = 20
-
-    for p in range(n_part) :
-        dot = patches.Circle(data[0,p,0:2], L/100.)
-        ax.add_patch(dot)
+    for t in range(trace) :
+        for p in range(n_part) :
+            dot = patches.Circle(data[t,p,0:2], L/100.)
+            ax.add_patch(dot)
 
     def frame(t):
-        start=max((t-trace,0))
+        start=max(t-trace,0)
         for p in range(n_part) :
             ax.patches.pop(0)
             dot = patches.Circle(data[t,p,0:2], L/400.)
