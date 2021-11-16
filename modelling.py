@@ -78,7 +78,7 @@ A class that compute a simulation of particules interacting with their neighboor
 
     def run(self, n_step) :
         """data format : np.array, shape = (n_step, n_part, 3) --> [time, particule ID, coordinates]
-                         + an array containing meta data : [L]
+                         + a ndarray metadata = [self.N, self.L, self.eta, self.speed]
            runs a simulation of n_step and return a numpy array formatted as above"""
         data = np.zeros((n_step, self.N, 3))
 
