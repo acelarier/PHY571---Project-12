@@ -4,14 +4,25 @@ file used to run functions
 !!! needs to execute modelling.py and UI.py before !!!
 """
 
-sim = Simulation(10, 0.1, 7, 0.1, 0.01) # reminder : numberParticles, interactionRadius, boxSize, noise, speed
+numberParticles = 300
+boxSize = 25
+etaNoise = 0.1
+speed = 0.03
+
+numberTimeStep = 1000
+
+
+
+
+
+sim = Simulation(numberParticles, boxSize, etaNoise, speed) # reminder : numberParticles, boxSize, noise, speed
 print('Simulation créée')
 
 sim.initialise() # initialize a random configuration
 print('Simulation initialisée. Calcul évolution...')
 
-data, metadata = sim.run(1000)
-print('Calcul terminé. Affchage...')
 
-displayPoints(data, metadata)
+data, metadata = sim.run(numberTimeStep)
+print('Calcul terminé. Affichage...')
 
+displayLines(data, metadata)
