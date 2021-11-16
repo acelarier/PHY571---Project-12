@@ -43,7 +43,6 @@ class particle:
 
 class Simulation:
     """arg : numberParticles, boxSize, etaNoise, speed
-
 A class that compute a simulation of particules interacting with their neighboors and moving within a box.
     The box has periodic boundary counditions.
         """
@@ -78,7 +77,7 @@ A class that compute a simulation of particules interacting with their neighboor
 
     def run(self, n_step) :
         """data format : np.array, shape = (n_step, n_part, 3) --> [time, particule ID, coordinates]
-                         + a ndarray metadata = [self.N, self.L, self.eta, self.speed]
+                         + an array containing meta data : [N, L, eta, speed, n_step]
            runs a simulation of n_step and return a numpy array formatted as above"""
         data = np.zeros((n_step, self.N, 3))
 
@@ -91,12 +90,6 @@ A class that compute a simulation of particules interacting with their neighboor
                 data[t,p,0:2] = self.particles[p].pos
                 data[t,p,2] = self.particles[p].theta
 
-        metadata = np.array([self.N, self.L, self.eta, self.speed])
+        metadata = np.array([self.N, self.L, self.eta, self.speed, n_step])
 
         return data, metadata
-
-
-
-
-
-
