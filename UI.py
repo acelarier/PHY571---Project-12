@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation, rc
 import matplotlib.patches as patches
+from matplotlib.widgets import Button
 
 
 
@@ -36,6 +37,12 @@ def fromFile() :
     data = np.load(path)
     return data
 
+def stop(event):
+    global anim
+    '''what to do here'''
+    anim.event_source.stop()
+    return
+
 
 def displayLines(data) :
     n_step, n_part = np.shape(data)[0:2]
@@ -46,36 +53,34 @@ def displayLines(data) :
     ax.set_xlim(-.1,1.1)
     ax.set_ylim(-.1,1.1)
 
-    def frame(i):
-        start=max((i-5,0))
-        for p in range(n_part) :
-            lines[p].set_data(data[start:i,p,0],data[start:i,p,1])
-        return lines
-
-    ani = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=200)
+    anim = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=20)
     plt.show()
+
 
 def displayPoints(data) :
     n_step, n_part = np.shape(data)[0:2]
 
     plt.close('all')
     fig, ax = plt.subplots()
-    for i in range(5) :
+    for t in range(5) :
         for p in range(n_part) :
-            dot = patches.Circle(data[i,p,0:2], 0.01)
+            dot = patches.Circle(data[t,p,0:2], 0.005, color='b')
             ax.add_patch(dot)
     ax.set_xlim(-.1,1.1)
     ax.set_ylim(-.1,1.1)
 
-    def frame(i):
-        start=max((i-5,0))
+    def frame(t):
+        start=max((t-5,0))
         for p in range(n_part) :
             ax.patches.pop(0)
-            dot = patches.Circle(data[i,p,0:2], 0.01)
+            dot = patches.Circle(data[t,p,0:2], 0.01)
             ax.add_patch(dot)
-        return lines
+        return ax
 
-    ani = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=200)
+    anim = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=20)
+
+
+
     plt.show()
 
 
@@ -83,11 +88,17 @@ def displayPoints(data) :
 
 """ usefull for later
 
-from matplotlib.widgets import Button
 
-def reset(event):
-    '''what to do here'''
-    ax.clear()
+    def frame(i):
+        start=max((i-5,0))
+        for p in range(n_part) :
+            lines[p].set_data(data[start:i,p,0],data[start:i,p,1])
+        return lines
+
+
+    button = Button(plt.axes([0.8, 0.025, 0.1, 0.04]), 'Stop', color='g', hovercolor='0.975')
+    button.on_clicked(stop)
+
 
 button.on_clicked(reset)
 """
