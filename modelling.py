@@ -47,7 +47,7 @@ A class that compute a simulation of particules interacting with their neighboor
     The box has periodic boundary counditions.
         """
 
-    def __init__(self, numberParticles, boxSize, etaNoise, speed):
+    def __init__(self, numberParticles = 20, boxSize = 7, etaNoise = 0.1, speed = 0.03):
         self.N = numberParticles
         self.R = 1
         self.L = boxSize

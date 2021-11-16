@@ -27,14 +27,14 @@ def genData() :
     return data
 
 
-def toFile(data, metadata) :
+def export(data, metadata, path = None) :
     """saves the results of a trial as .npy files :
     data     --> path + '_data'
     metadata --> path + '_metadata'"""
-
-    current = os.getcwd()
-    print('Current directory : ' + current)
-    path = str(input('\nEnter path+filename : '))
+    if path == None :
+        current = os.getcwd()
+        print('Current directory : ' + current)
+        path = str(input('\nEnter path+filename : '))
 
     np.save(path + '_data', data)
     np.save(path + '_metadata', metadata)
@@ -42,20 +42,22 @@ def toFile(data, metadata) :
     print('\nSimulation results saved as :\n' + path + '_data.npy\n' + path + '_metadata.npy' )
     return
 
-def fromFile() :
+
+
+def inport(path == None) :
     """loads the results of a trial as numpy arrays
 ex : for two files named
     monday_sim_1_data.npy
     monday_sim_1_metadata.npy
-then only write path + 'monday_sim_1' as an input
-!!! don't write '.npy' !!!"""
-    current = os.getcwd()
-    print('Current directory : ' + current)
-    path = str(input('\nEnter path+filename : '))
+   éxxxxxxxxxxx
+
+    if path == None :
+        current = os.getcwd()
+        print('Current directory : ' + current)
+        path = str(input('\nEnter path+filename : '))
 
     data = np.load(path + '_data.npy')
     metadata = np.load(path + '_metadata.npy')
-
     print('\nLoaded from :\n' + path + '_data.npy\n' + path + '_metadata.npy' )
     return data, metadata
 
