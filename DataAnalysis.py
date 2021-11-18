@@ -11,6 +11,7 @@ calculate using data, metadata
 
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 def AverageVelocity(data, metadata):
     """return the average velocity  (between 0 and 1) from the numpy vector data
@@ -56,3 +57,37 @@ def basicTesting() :
     plt.title('Calculating v_a as in Viscek 1995, fig2')
     plt.legend()
     plt.show()
+
+
+
+def upgradedTesting() :
+    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/testNoise'
+
+    noises = []
+    vas = []
+
+    exit = False
+    i = 0
+    while not exit :
+        testPath = basePath + '_run' + str(i)
+        try :
+            data, meta = importData(testPath)
+        except :
+            exit = True
+        else :
+            # each simulation is processed inloop to keep the cached memory light
+            va = AverageVelocity(data, meta)
+            noises.append(meta[2])
+            vas.append(va)
+        i += 1
+
+    plt.close('all')
+    plt.figure()
+    thisLabel = 'N = %d, L = %f'%(meta[0], meta[1]) # crapy assignment...
+    plt.plot(noises, vas, label = thisLabel)
+    plt.xlabel('noise')
+    plt.ylabel('average velocity')
+    plt.title('Calculating v_a as in Viscek 1995, fig2')
+    plt.legend()
+    plt.show()
+
