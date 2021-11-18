@@ -4,6 +4,7 @@ calculate using data, metadata
 
 
 # to do : a function tht takes a basePath and return a list of EXACT (dataPath, metadataPath) tabs / return a iterable /
+# change UI.py (see headers in UI.py)
 
 
 
@@ -61,7 +62,7 @@ def basicTesting() :
 
 
 def upgradedTesting() :
-    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/testNoise'
+    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/upgradedTesting/testNoise'
 
     noises = []
     vas = []

@@ -36,7 +36,7 @@ class testBench:
 
     def showProgress(self) :
         prg = int(100*self.current_run/self.total_runs)
-        print(prg)
+        print('\nProgress : %d\n'%(prg))
 
     def run(self) :
 
@@ -69,8 +69,8 @@ class testBench:
 ## executable code
 
 def testingTheTestBench() :
-    testNoise = np.array([[40, 3.1, i/10, 0.03, 100] for i in range(10)])
-    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/testNoise'
+    testNoise = np.array([[40, 3.1, 5*i/30, 0.03, 1000] for i in range(30)])
+    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/upgradedTesting/testNoise'
     bench = testBench(testNoise, basePath)
 
     bench.run()

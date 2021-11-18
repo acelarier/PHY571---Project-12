@@ -5,6 +5,9 @@ formating :
     coordinates --> [x, y, theta]
 """
 
+
+# to do : modify UI.py so that filename and directory name are always distinguished ----> exportData only show filename (and not the path)
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation, rc
