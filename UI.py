@@ -27,7 +27,7 @@ def genData() :
     return data
 
 
-def export(data, metadata, path = None) :
+def exportData(data, metadata, path = None) :
     """saves the results of a trial as .npy files :
     data     --> path + '_data'
     metadata --> path + '_metadata'"""
@@ -44,12 +44,12 @@ def export(data, metadata, path = None) :
 
 
 
-def inport(path == None) :
+def importData(path = None) :
     """loads the results of a trial as numpy arrays
-ex : for two files named
+    ex : for two files named
     monday_sim_1_data.npy
     monday_sim_1_metadata.npy
-   éxxxxxxxxxxx
+    """
 
     if path == None :
         current = os.getcwd()
