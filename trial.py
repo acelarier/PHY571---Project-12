@@ -14,9 +14,9 @@ import time
 
 class testBench:
 
-    def __init__(self, metadatas , wrkdir) :
+    def __init__(self, metadatas , basePath) :
         self.mds = metadatas
-        self.wrkdir = wrkdir
+        self.basePath = basePath
 
         self.total_runs = len(metadatas)
         self.current_run = -1
@@ -28,8 +28,8 @@ class testBench:
 
         #self.sim = Simulation()
 
-    def setPath(self, new_wrkdir) :
-        self.wrkdir = new_wrkdir
+    def setPath(self, newBasePath) :
+        self.basePath = newBasePath
 
     def setmetadatas(self, mds) :
         self.metadatas = mds
@@ -56,7 +56,7 @@ class testBench:
             self.runtimes[i] = self.stop_time - self.start_time
             self.showProgress()
 
-            exportData(data, meta, self.wrkdir + 'run' + str(i))
+            exportData(data, meta, self.basePath + '_run' + str(i))
 
 
 
@@ -70,8 +70,8 @@ class testBench:
 
 def testingTheTestBench() :
     testNoise = np.array([[40, 3.1, i/10, 0.03, 100] for i in range(10)])
-    wrkdir = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/testNoise'
-    bench = testBench(testNoise, wrkdir)
+    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/testNoise'
+    bench = testBench(testNoise, basePath)
 
     bench.run()
 
