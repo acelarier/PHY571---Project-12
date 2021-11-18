@@ -29,8 +29,9 @@ def AverageVelocity(data, metadata):
 
     V_A = 1/N*(SumCos**2 + SumSin**2)**0.5
     v_a = np.mean(V_A)
+    var = np.var(V_A)
 
-    return v_a
+    return v_a, var
 
 
 
@@ -44,11 +45,13 @@ def basicTesting() :
     noises = [i/10 for i in range(10)]
 
     vas = []
+    vars = []
     for i in range(10) :
         path = basePath + '_run' + str(i)
         data, meta = importData(path)
-        va = AverageVelocity(data, meta)
+        va, var = AverageVelocity(data, meta)
         vas.append(va)
+        vars.append(var)
 
     plt.close('all')
     plt.figure()
@@ -66,6 +69,7 @@ def upgradedTesting() :
 
     noises = []
     vas = []
+    vars = []
 
     exit = False
     i = 0
@@ -77,15 +81,26 @@ def upgradedTesting() :
             exit = True
         else :
             # each simulation is processed inloop to keep the cached memory light
-            va = AverageVelocity(data, meta)
+            va, var = AverageVelocity(data, meta)
             noises.append(meta[2])
             vas.append(va)
+            vars.append(var)
         i += 1
+
+    noises = np.array(noises)
+    vas = np.array(vas)
+    vars = np.array(vars)
+    N = str(int(meta[0]))
+    L = "{:.2f}".format(meta[1])
+
 
     plt.close('all')
     plt.figure()
-    thisLabel = 'N = %d, L = %f'%(meta[0], meta[1]) # crapy assignment...
+
+    thisLabel = 'N = '+N+', L = '+L # crapy assignment...
     plt.plot(noises, vas, label = thisLabel)
+    plt.fill_between(noises, vas-vars, vas+vars, edgecolor='#3F7F4C', facecolor='#3F7F4C', interpolate = True, alpha=0.1, linewidth=0)
+
     plt.xlabel('noise')
     plt.ylabel('average velocity')
     plt.title('Calculating v_a as in Viscek 1995, fig2')
