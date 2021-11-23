@@ -35,11 +35,11 @@ class testBench:
         self.metadatas = mds
 
     def showProgress(self) :
-        prg = int(100*self.current_run/self.total_runs)
-        print('\nProgress : %d\n'%(prg))
+        print('\nProgress : %d/%d\n'%(self.current_run,self.total_runs))
 
     def run(self) :
 
+        self.current_run = 0
         for i in range(self.total_runs) :
             N = int(self.mds[i,0])
             L = self.mds[i,1]
@@ -54,6 +54,7 @@ class testBench:
             data, meta = self.sim.run(n_step)
             self.stop_time = time.time()
             self.runtimes[i] = self.stop_time - self.start_time
+            self.current_run += 1
             self.showProgress()
 
             exportData(data, meta, self.basePath + '_run' + str(i))
@@ -69,8 +70,8 @@ class testBench:
 ## executable code
 
 def testingTheTestBench() :
-    testNoise = np.array([[40, 3.1, 5*i/30, 0.03, 1000] for i in range(30)])
-    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/upgradedTesting/testNoise'
+    testNoise = np.array([[100, 5, 5*i/30, 0.03, 1000] for i in range(30)])
+    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/100particles/first_run'
     bench = testBench(testNoise, basePath)
 
     bench.run()
@@ -99,9 +100,4 @@ def oneTrial() :
 
 
 
-
-
-def main() :
-    testingTheTestBench()
-    return
 

@@ -65,7 +65,7 @@ def basicTesting() :
 
 
 def upgradedTesting() :
-    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/upgradedTesting/testNoise'
+    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/100particles/first_run'
 
     noises = []
     vas = []

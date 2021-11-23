@@ -49,9 +49,8 @@ def exportData(data, metadata, path = None) :
 
 def importData(path = None) :
     """loads the results of a trial as numpy arrays
-    ex : for two files named
-    monday_sim_1_data.npy
-    monday_sim_1_metadata.npy
+    ex :
+    for two files named "monday_sim_1_data.npy" and "monday_sim_1_metadata.npy" run : importData('/Users/antoine/Documents/...directories.../monday_sim_1')
     """
 
     if path == None :
