@@ -70,8 +70,8 @@ class testBench:
 ## executable code
 
 def testingTheTestBench() :
-    testNoise = np.array([[100, 5, 5*i/30, 0.03, 1000] for i in range(30)])
-    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/100particles/first_run'
+    testNoise = np.array([[40, 3.1, 5*i/30, 0.03, 1000] for i in range(30)])
+    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/40 particles/atan av'
     bench = testBench(testNoise, basePath)
 
     bench.run()

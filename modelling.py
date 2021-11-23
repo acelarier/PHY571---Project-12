@@ -23,10 +23,22 @@ class particle:
     #calculus of the average direction of the velocities of particles being within a circle of radius r surrounding the given particle (neighbors).
         averageNeighborsOrientation = 0
         neighborsNumber = len(neighbors)
+
+        """OLD VERSION"""
         for neighbor in neighbors :
             averageNeighborsOrientation += neighbor.theta
         averageNeighborsOrientation = averageNeighborsOrientation / neighborsNumber
-        self.theta = averageNeighborsOrientation + random.uniform(-self.eta/2,self.eta/2)
+
+        """NEWVERSION"""
+        avCos = 0
+        avSin = 0
+        for neighbor in neighbors :
+            avCos += np.cos(neighbor.theta)
+            avSin += np.sin(neighbor.theta)
+        # avCos & avSin are not normalised because we use only their ratio
+        alternativeAverageNeighborsOrientation = math.atan(avSin/avCos)
+
+        self.theta = alternativeAverageNeighborsOrientation + random.uniform(-self.eta/2,self.eta/2)
         self.theta = self.theta%(2*math.pi)
 
 

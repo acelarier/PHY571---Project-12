@@ -30,8 +30,10 @@ def AverageVelocity(data, metadata):
     V_A = 1/N*(SumCos**2 + SumSin**2)**0.5
     v_a = np.mean(V_A)
     var = np.var(V_A)
+    v_a_END = np.mean(V_A[300:])
+    var_END = np.var(V_A[300:])
 
-    return v_a, var
+    return v_a_END, var_END
 
 
 
@@ -65,7 +67,7 @@ def basicTesting() :
 
 
 def upgradedTesting() :
-    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/100particles/first_run'
+    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/40 particles/atan av/atan av'
 
     noises = []
     vas = []
@@ -95,7 +97,8 @@ def upgradedTesting() :
 
 
     plt.close('all')
-    plt.figure()
+    plt.figure(figsize=(8,8))
+
 
     thisLabel = 'N = '+N+', L = '+L # crapy assignment...
     plt.plot(noises, vas, label = thisLabel)
