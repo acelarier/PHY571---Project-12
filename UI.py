@@ -76,6 +76,7 @@ def displayLines(data, metadata) :
     trace = 20
 
     plt.close('all')
+    plt.figure(figsize = (5,5))
     fig, ax = plt.subplots()
     lines = [ax.plot(data[0,p,0], data[0,p,1], linewidth = 0.5, color='r')[0] for p in range(n_part)]
     L = metadata[1]

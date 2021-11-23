@@ -67,7 +67,7 @@ def basicTesting() :
 
 
 def upgradedTesting() :
-    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/40 particles/atan av/atan av'
+    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/40 particles/more noise/noise_to_10'
 
     noises = []
     vas = []
@@ -97,7 +97,7 @@ def upgradedTesting() :
 
 
     plt.close('all')
-    plt.figure(figsize=(8,8))
+    plt.figure(figsize=(5,5))
 
 
     thisLabel = 'N = '+N+', L = '+L # crapy assignment...

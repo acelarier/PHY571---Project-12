@@ -12,11 +12,11 @@ class particle:
     """A class that define a particule (a bird) by his position and oriented speed.
         """
 
-    def __init__(self, position, speed, orientation, noise, boxSize):
+    def __init__(self, position, speed, theta, noise, boxSize):
         self.pos = position
-        self.v = speed
-        self.theta = orientation
-        self.eta = noise
+        self.speed = speed
+        self.theta = theta
+        self.noise = noise
         self.L = boxSize
 
     def updateOrientation(self, neighbors):
@@ -38,14 +38,14 @@ class particle:
         # avCos & avSin are not normalised because we use only their ratio
         alternativeAverageNeighborsOrientation = math.atan(avSin/avCos)
 
-        self.theta = alternativeAverageNeighborsOrientation + random.uniform(-self.eta/2,self.eta/2)
+        self.theta = alternativeAverageNeighborsOrientation + random.uniform(-self.noise/2,self.noise/2)
         self.theta = self.theta%(2*math.pi)
 
 
     def updatePosition(self):
     #it is assumed that the time unit between two updates is the unit of time.
-        self.pos[0]+=np.cos(self.theta)*self.v
-        self.pos[1]+=np.sin(self.theta)*self.v
+        self.pos[0]+=np.cos(self.theta)*self.speed
+        self.pos[1]+=np.sin(self.theta)*self.speed
         for i in range(2):
             if self.pos[i]>self.L :
                 self.pos[i]-=self.L
@@ -54,22 +54,22 @@ class particle:
 
 
 class Simulation:
-    """arg : numberParticles, boxSize, etaNoise, speed
+    """arg : N, L, noise, speed
 A class that compute a simulation of particules interacting with their neighboors and moving within a box.
     The box has periodic boundary counditions.
         """
 
-    def __init__(self, numberParticles = 20, boxSize = 7, etaNoise = 0.1, speed = 0.03):
-        self.N = numberParticles
+    def __init__(self, N = 20, L = 7, noise = 0.1, speed = 0.03):
+        self.N = N
         self.R = 1
-        self.L = boxSize
-        self.eta = etaNoise
+        self.L = L
+        self.noise = noise
         self.speed = speed
         self.particles = list()
 
     def initialise(self) :
         for i in range(self.N) :
-            self.particles.append(particle(np.array([random.uniform(0,self.L), random.uniform(0,self.L)]), self.speed, random.uniform(0,2*np.pi), self.eta, self.L))
+            self.particles.append(particle(np.array([random.uniform(0,self.L), random.uniform(0,self.L)]), self.speed, random.uniform(0,2*np.pi), self.noise, self.L))
 
     def getNeighbors(self, particle):
         neighbors = []
@@ -87,21 +87,30 @@ A class that compute a simulation of particules interacting with their neighboor
         for i in range(self.N):
             self.particles[i].updatePosition()
 
-    def run(self, n_step) :
+    def run(self, n_step, verbose=False) :
         """data format : np.array, shape = (n_step, n_part, 3) --> [time, particule ID, coordinates]
-                         + an array containing meta data : [N, L, eta, speed, n_step]
+                         + an array containing meta data : [N, L, noise, speed, n_step]
            runs a simulation of n_step and return a numpy array formatted as above"""
+
+        if verbose : print('Simulation start...')
+
         data = np.zeros((n_step, self.N, 3))
 
         for p in range(1,self.N) :
             data[0,0,0:2] = self.particles[p].pos
             data[0,0,2] = self.particles[p].theta
         for t in range(1,n_step) :
+            if verbose : print('Step : %d/%d'%(t,n_step))
             self.doStep()
             for p in range(1,self.N) :
                 data[t,p,0:2] = self.particles[p].pos
                 data[t,p,2] = self.particles[p].theta
 
-        metadata = np.array([self.N, self.L, self.eta, self.speed, n_step])
+        metadata = np.array([self.N, self.L, self.noise, self.speed, n_step])
+
+        if verbose : print('End of simulation')
 
         return data, metadata
+
+
+

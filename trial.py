@@ -70,29 +70,29 @@ class testBench:
 ## executable code
 
 def testingTheTestBench() :
-    testNoise = np.array([[40, 3.1, 5*i/30, 0.03, 1000] for i in range(30)])
-    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/40 particles/atan av'
+    testNoise = np.array([[40, 3.1, 10*i/30, 0.03, 1000] for i in range(30)])
+    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/40 particles/more noise/noise_to_10'
     bench = testBench(testNoise, basePath)
 
     bench.run()
 
 
 def oneTrial() :
-    numberParticles = 300
-    boxSize = 25
-    etaNoise = 0.1
+    N = 300
+    L = 25
+    noise = 0.1
     speed = 0.03
 
-    numberTimeStep = 1000
+    numberTimeStep = 30
 
-    sim = Simulation(numberParticles, boxSize, etaNoise, speed) # reminder : numberParticles, boxSize, noise, speed
+    sim = Simulation(N, L, noise, speed) # reminder : numberParticles, boxSize, noise, speed
     print('Simulation créée')
 
     sim.initialise() # initialize a random configuration
     print('Simulation initialisée. Calcul évolution...')
 
 
-    data, metadata = sim.run(numberTimeStep)
+    data, metadata = sim.run(numberTimeStep, verbose=True)
     print('Calcul terminé. Affichage...')
 
     displayLines(data, metadata)
