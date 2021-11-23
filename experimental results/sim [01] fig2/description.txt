@@ -1,0 +1,5 @@
+these experiments aim to reproduce the results shown in Vicsek 1995, fig2 (see biblio [02]
+
+
+
+for the moment it is only the output of the testBench tht is still under testing
