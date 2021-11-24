@@ -37,7 +37,7 @@ class testBench:
     def showProgress(self) :
         print('\nProgress : %d/%d\n'%(self.current_run,self.total_runs))
 
-    def run(self) :
+    def run(self, verbSim=False) :
 
         self.current_run = 0
         for i in range(self.total_runs) :
@@ -51,7 +51,7 @@ class testBench:
             self.sim.initialise() # eventually add an input possibility for this function to always start with the same distribution...
 
             self.start_time = time.time()
-            data, meta = self.sim.run(n_step)
+            data, meta = self.sim.run(n_step, verbose=verbSim)
             self.stop_time = time.time()
             self.runtimes[i] = self.stop_time - self.start_time
             self.current_run += 1
@@ -70,11 +70,11 @@ class testBench:
 ## executable code
 
 def testingTheTestBench() :
-    testNoise = np.array([[40, 3.1, 10*i/30, 0.03, 1000] for i in range(30)])
-    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/40 particles/more noise/noise_to_10'
+    testNoise = np.array([[100, 3.1, 5*(i+1)/3, 0.03, 1000] for i in range(3)])
+    basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/NOISE'
     bench = testBench(testNoise, basePath)
 
-    bench.run()
+    bench.run(verbSim=True)
 
 
 def oneTrial() :

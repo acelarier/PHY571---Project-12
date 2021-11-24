@@ -6,3 +6,9 @@ relaxation va.png --> simulation results (obtained on wed. 24 nov.) for
 	noise = 0.1
 	speed = 0.03
 we observe that the average speed takes time to reach its equilibrium value
+
+
+fluctuations.png --> shows the order parameter fluctuations for various situations
+
+
+fluctuationsFlattened.png --> idem but after averaging over 100 time steps

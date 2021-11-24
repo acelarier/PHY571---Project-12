@@ -16,7 +16,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-def AverageVelocity(data, metadata):
+def AverageVelocity(data, metadata, cut=0):
     """return the average velocity  (between 0 and 1) from the numpy vector data
     with the formula from the ref (2)
     velocity averaged on particules AND time"""
@@ -30,12 +30,31 @@ def AverageVelocity(data, metadata):
     SumSin = np.sum(Sin, axis=1)
 
     V_A = 1/N*(SumCos**2 + SumSin**2)**0.5
-    v_a = np.mean(V_A)
-    var = np.var(V_A)
-    v_a_END = np.mean(V_A[300:])
-    var_END = np.var(V_A[300:])
+    v_a = np.mean(V_A[cut:])
+    var = np.var(V_A[cut:])
 
     return v_a, var
+
+def timeSeries(data, meta) :
+    N = int(meta[0])
+    n_step = int(meta[-1])
+
+    Cos = np.cos(data[:, :, 2])
+    Sin = np.sin(data[:, :, 2])
+    SumCos = np.sum(Cos, axis=1)
+    SumSin = np.sum(Sin, axis=1)
+
+    V_A = 1/N*(SumCos**2 + SumSin**2)**0.5
+    slidingV_A = np.zeros(n_step)
+
+    # building a sliding average
+    for step in range(n_step) :
+        av = 0
+        for i in range(100) :
+            added_step = max(0, step-i)
+            av += V_A[added_step]/100
+        slidingV_A[step] += av
+    return V_A, slidingV_A
 
 
 
@@ -113,48 +132,102 @@ def upgradedTesting() :
     plt.show()
 
 
-def testingRelaxationTime() :
 
-    # input
-    N = 100
-    L = 25
-    noise = 0.1
-    speed = 0.03
-    n_step = 1000
+def testingRelaxation() :
+    basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/NOISE'
 
-    # simulating
-    sim = Simulation(N, L, noise, speed) # reminder : numberParticles, boxSize, noise, speed
-    print('Simulation créée')
-    sim.initialise() # initialize a random configuration
-    print('Simulation initialisée. Calcul évolution...')
-    data, metadata = sim.run(n_step, verbose=True)
-    print('Calcul terminé. Affichage...')
+    noises = []
+    vas = []
+    vars = []
+    vasCut = []
+    varsCut = []
 
-    # analysis
-    Cos = np.cos(data[:, :, 2])
-    Sin = np.sin(data[:, :, 2])
-    SumCos = np.sum(Cos, axis=1)
-    SumSin = np.sum(Sin, axis=1)
+    exit = False
+    i = 0
+    while not exit :
+        testPath = basePath + '_run' + str(i)
+        try :
+            data, meta = importData(testPath)
+        except :
+            exit = True
+        else :
+            # each simulation is processed inloop to keep the cached memory light
+            va, var = AverageVelocity(data, meta, cut=0)
+            noises.append(meta[2])
+            vas.append(va)
+            vars.append(var)
 
-    V_A = 1/N*(SumCos**2 + SumSin**2)**0.5
-    slidingV_A = np.zeros(n_step)
+            n_step = int(meta[-1])
+            vaCut, varCut = AverageVelocity(data, meta, cut=int(n_step*0.9))
+            vasCut.append(vaCut)
+            varsCut.append(varCut)
 
-    # building a sliding average
-    for step in range(n_step) :
-        av = 0
-        for i in range(50) :
-            added_step = max(0, step-i)
-            av += V_A[added_step]/50
-        slidingV_A[step] += av
+        i += 1
 
-    Ts = np.arange(n_step)
+    noises = np.array(noises)
+    vas = np.array(vas)
+    vars = np.array(vars)
+    vasCut = np.array(vasCut)
+    varsCut = np.array(varsCut)
+    N = str(int(meta[0]))
+    L = "{:.2f}".format(meta[1])
+
 
     plt.close('all')
-    plt.figure()
-    plt.plot(Ts, V_A, Ts, slidingV_A)
-    plt.ylim(0,1)
-    plt.xlabel('step')
-    plt.ylabel('v_a')
-    plt.grid()
+    plt.figure(figsize=(5,5))
+
+
+    thisLabel = 'N = '+N+', L = '+L # crapy assignment...
+    plt.plot(noises, vas, label = thisLabel + 'unrelaxed')
+    plt.plot(noises, vasCut, label = thisLabel + 'relaxed (cut)')
+    plt.fill_between(noises, vasCut-varsCut, vasCut+varsCut, edgecolor='#3F7F4C', facecolor='#3F7F4C', interpolate = True, alpha=0.1, linewidth=0)
+
+    plt.xlabel('noise')
+    plt.ylabel('average velocity')
+    plt.title('Showing the difference with a relaxed situation')
+    plt.legend()
     plt.show()
 
+
+
+def showingRelaxation() :
+    """show the time evolution of v_a for a series of run
+indicate a directory containing the result of a testBench run in the variable 'basePath'"""
+    basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/first_run'
+
+    noises = []
+    vaSeries = []
+
+    exit = False
+    i = 0
+    while not exit :
+        testPath = basePath + '_run' + str(i)
+        try :
+            data, meta = importData(testPath)
+        except :
+            exit = True
+        else :
+            # each simulation is processed inloop to keep the cached memory light
+            va = timeSeries(data, meta)[1]
+            noises.append(meta[2])
+            vaSeries.append(va)
+        i += 1
+
+    N = str(int(meta[0]))
+    L = "{:.2f}".format(meta[1])
+
+
+    plt.close('all')
+    plt.figure(figsize=(5,5))
+
+    for i in range(len(noises)) :
+        thisLabel = 'N = '+N+', L = '+L+', noise = '+"{:.2f}".format(noises[i]) # crapy assignment...
+        plt.plot(np.arange(len(vaSeries[i])), vaSeries[i], label = thisLabel)
+
+    plt.xlabel('step')
+    plt.ylabel('average velocity')
+    plt.ylim(0,1)
+    #plt.grid()
+    plt.title('Time evolution of v_a')
+    plt.legend()
+    plt.show()
