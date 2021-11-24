@@ -78,6 +78,7 @@ def displayLines(data, metadata) :
     plt.close('all')
     plt.figure(figsize = (5,5))
     fig, ax = plt.subplots()
+    plt.grid()
     lines = [ax.plot(data[0,p,0], data[0,p,1], linewidth = 0.5, color='r')[0] for p in range(n_part)]
     L = metadata[1]
     ax.set_xlim(0,L)
@@ -99,6 +100,7 @@ def displayPoints(data, metadata) :
 
     plt.close('all')
     fig, ax = plt.subplots()
+    plt.grid()
     L = metadata[1]
     ax.set_xlim(0,L)
     ax.set_ylim(0,L)

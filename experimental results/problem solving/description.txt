@@ -1,0 +1,8 @@
+description of pictures :
+
+relaxation va.png --> simulation results (obtained on wed. 24 nov.) for 
+	N = 100
+	L = 25
+	noise = 0.1
+	speed = 0.03
+we observe that the average speed takes time to reach its equilibrium value

@@ -7,6 +7,8 @@ calculate using data, metadata
 # change UI.py (see headers in UI.py)
 
 
+# activity : investigation of AverageVelocity on wednesday, 24 nov.
+
 
 ## toolkit
 
@@ -33,7 +35,7 @@ def AverageVelocity(data, metadata):
     v_a_END = np.mean(V_A[300:])
     var_END = np.var(V_A[300:])
 
-    return v_a_END, var_END
+    return v_a, var
 
 
 
@@ -67,7 +69,7 @@ def basicTesting() :
 
 
 def upgradedTesting() :
-    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/40 particles/more noise/noise_to_10'
+    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/testNoise'
 
     noises = []
     vas = []
@@ -108,5 +110,51 @@ def upgradedTesting() :
     plt.ylabel('average velocity')
     plt.title('Calculating v_a as in Viscek 1995, fig2')
     plt.legend()
+    plt.show()
+
+
+def testingRelaxationTime() :
+
+    # input
+    N = 100
+    L = 25
+    noise = 0.1
+    speed = 0.03
+    n_step = 1000
+
+    # simulating
+    sim = Simulation(N, L, noise, speed) # reminder : numberParticles, boxSize, noise, speed
+    print('Simulation créée')
+    sim.initialise() # initialize a random configuration
+    print('Simulation initialisée. Calcul évolution...')
+    data, metadata = sim.run(n_step, verbose=True)
+    print('Calcul terminé. Affichage...')
+
+    # analysis
+    Cos = np.cos(data[:, :, 2])
+    Sin = np.sin(data[:, :, 2])
+    SumCos = np.sum(Cos, axis=1)
+    SumSin = np.sum(Sin, axis=1)
+
+    V_A = 1/N*(SumCos**2 + SumSin**2)**0.5
+    slidingV_A = np.zeros(n_step)
+
+    # building a sliding average
+    for step in range(n_step) :
+        av = 0
+        for i in range(50) :
+            added_step = max(0, step-i)
+            av += V_A[added_step]/50
+        slidingV_A[step] += av
+
+    Ts = np.arange(n_step)
+
+    plt.close('all')
+    plt.figure()
+    plt.plot(Ts, V_A, Ts, slidingV_A)
+    plt.ylim(0,1)
+    plt.xlabel('step')
+    plt.ylabel('v_a')
+    plt.grid()
     plt.show()
 

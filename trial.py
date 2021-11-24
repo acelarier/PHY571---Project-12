@@ -83,7 +83,7 @@ def oneTrial() :
     noise = 0.1
     speed = 0.03
 
-    numberTimeStep = 30
+    n_step = 30
 
     sim = Simulation(N, L, noise, speed) # reminder : numberParticles, boxSize, noise, speed
     print('Simulation créée')
@@ -92,7 +92,7 @@ def oneTrial() :
     print('Simulation initialisée. Calcul évolution...')
 
 
-    data, metadata = sim.run(numberTimeStep, verbose=True)
+    data, metadata = sim.run(n_step, verbose=True)
     print('Calcul terminé. Affichage...')
 
     displayLines(data, metadata)
