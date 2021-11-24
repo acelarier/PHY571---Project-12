@@ -88,7 +88,7 @@ def basicTesting() :
 
 
 def upgradedTesting() :
-    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/testNoise'
+    basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/100p_long_run'
 
     noises = []
     vas = []
@@ -134,7 +134,7 @@ def upgradedTesting() :
 
 
 def testingRelaxation() :
-    basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/NOISE'
+    basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/100p_long_run'
 
     noises = []
     vas = []
@@ -193,7 +193,7 @@ def testingRelaxation() :
 def showingRelaxation() :
     """show the time evolution of v_a for a series of run
 indicate a directory containing the result of a testBench run in the variable 'basePath'"""
-    basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/first_run'
+    basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/100p_long_run'
 
     noises = []
     vaSeries = []
