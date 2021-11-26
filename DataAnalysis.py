@@ -1,5 +1,5 @@
 """
-calculate using data, metadata
+calculate using data, meta
 """
 
 
@@ -16,13 +16,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-def AverageVelocity(data, metadata, cut=0):
-    """return the average velocity  (between 0 and 1) from the numpy vector data
-    with the formula from the ref (2)
-    velocity averaged on particules AND time"""
+def AverageVelocity(data, meta, cut=0):
+    """return the average velocity  (between 0 and 1) from the numpy vector data with the formula from ref [02]
+velocity is averaged on particules AND timesteps
 
-    N = metadata[0]
-    n_step = metadata[4]
+optionnal parameter 'cut' (integer) allows to ignore the first <cut> timesteps"""
+
+    N = meta[0]
+    n_step = meta[4]
 
     Cos = np.cos(data[:, :, 2])
     Sin = np.sin(data[:, :, 2])
@@ -35,9 +36,15 @@ def AverageVelocity(data, metadata, cut=0):
 
     return v_a, var
 
-def timeSeries(data, meta) :
+def timeSeries(data, meta, smooth=0.1) :
+    """builds the the time sequence of the average speed for a given simulation output
+also builds a sliding average for readability with optionnal parameter smooth
+    smooth = 0 --> no averaging
+    smooth = 1 --> averaging on all time length"""
+
     N = int(meta[0])
     n_step = int(meta[-1])
+    smoothingLenght = int(smooth*n_step)
 
     Cos = np.cos(data[:, :, 2])
     Sin = np.sin(data[:, :, 2])
@@ -50,9 +57,9 @@ def timeSeries(data, meta) :
     # building a sliding average
     for step in range(n_step) :
         av = 0
-        for i in range(100) :
+        for i in range(smoothingLenght) :
             added_step = max(0, step-i)
-            av += V_A[added_step]/100
+            av += V_A[added_step]/smoothingLenght
         slidingV_A[step] += av
     return V_A, slidingV_A
 
@@ -62,32 +69,10 @@ def timeSeries(data, meta) :
 
 
 
-def basicTesting() :
-    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/testNoise'
-
-    noises = [i/10 for i in range(10)]
-
-    vas = []
-    vars = []
-    for i in range(10) :
-        path = basePath + '_run' + str(i)
-        data, meta = importData(path)
-        va, var = AverageVelocity(data, meta)
-        vas.append(va)
-        vars.append(var)
-
-    plt.close('all')
-    plt.figure()
-    plt.plot(noises, vas, label = 'N = 40, L = 3.1')
-    plt.xlabel('noise')
-    plt.ylabel('average velocity')
-    plt.title('Calculating v_a as in Viscek 1995, fig2')
-    plt.legend()
-    plt.show()
-
-
-
 def upgradedTesting() :
+    """reads a set of files to plot the average speed as a function of the noise
+the files must have the format defined in testBench.run"""
+
     #basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/100p_long_run'
     basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/100 particles/long_run/100p_long_run'
 
@@ -98,18 +83,21 @@ def upgradedTesting() :
     exit = False
     i = 0
     while not exit :
-        testPath = basePath + '_run' + str(i)
+        testPath = basePath + '_sim' + str(i)
         try :
             data, meta = importData(testPath)
         except :
             exit = True
         else :
-            # each simulation is processed inloop to keep the cached memory light
+            # each ParticleSystem is processed inloop to keep the cached memory light
             va, var = AverageVelocity(data, meta)
             noises.append(meta[2])
             vas.append(va)
             vars.append(var)
-        i += 1
+            i += 1
+    if i==0 :
+        print('[ERROR] Failed to load files')
+        return
 
     noises = np.array(noises)
     vas = np.array(vas)
@@ -132,9 +120,14 @@ def upgradedTesting() :
     plt.legend()
     plt.show()
 
+    return
+
+
 
 
 def testingRelaxation() :
+    """reads a set of files to plot the average speed AND the average speed cutted as a function of the noise
+the files must have the format defined in testBench.run"""
     basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/100p_long_run'
 
     noises = []
@@ -146,20 +139,20 @@ def testingRelaxation() :
     exit = False
     i = 0
     while not exit :
-        testPath = basePath + '_run' + str(i)
+        testPath = basePath + '_sim' + str(i)
         try :
             data, meta = importData(testPath)
         except :
             exit = True
         else :
-            # each simulation is processed inloop to keep the cached memory light
+            # each ParticleSystem is processed inloop to keep the cached memory light
             va, var = AverageVelocity(data, meta, cut=0)
             noises.append(meta[2])
             vas.append(va)
             vars.append(var)
 
             n_step = int(meta[-1])
-            vaCut, varCut = AverageVelocity(data, meta, cut=int(n_step*0.9))
+            vaCut, varCut = AverageVelocity(data, meta, cut=0.1)
             vasCut.append(vaCut)
             varsCut.append(varCut)
 
@@ -179,8 +172,8 @@ def testingRelaxation() :
 
 
     thisLabel = 'N = '+N+', L = '+L # crapy assignment...
-    plt.plot(noises, vas, label = thisLabel + 'unrelaxed')
-    plt.plot(noises, vasCut, label = thisLabel + 'relaxed (cut)')
+    plt.plot(noises, vas, label = thisLabel + ' unrelaxed')
+    plt.plot(noises, vasCut, label = thisLabel + ' relaxed (cut)')
     plt.fill_between(noises, vasCut-varsCut, vasCut+varsCut, edgecolor='#3F7F4C', facecolor='#3F7F4C', interpolate = True, alpha=0.1, linewidth=0)
 
     plt.xlabel('noise')
@@ -188,6 +181,8 @@ def testingRelaxation() :
     plt.title('Showing the difference with a relaxed situation')
     plt.legend()
     plt.show()
+
+
 
 
 
@@ -202,13 +197,13 @@ indicate a directory containing the result of a testBench run in the variable 'b
     exit = False
     i = 0
     while not exit :
-        testPath = basePath + '_run' + str(i)
+        testPath = basePath + '_sim' + str(i)
         try :
             data, meta = importData(testPath)
         except :
             exit = True
         else :
-            # each simulation is processed inloop to keep the cached memory light
+            # each ParticleSystem is processed inloop to keep the cached memory light
             va = timeSeries(data, meta)[1]
             noises.append(meta[2])
             vaSeries.append(va)
@@ -228,7 +223,7 @@ indicate a directory containing the result of a testBench run in the variable 'b
     plt.xlabel('step')
     plt.ylabel('average velocity')
     plt.ylim(0,1)
-    #plt.grid()
+    plt.grid()
     plt.title('Time evolution of v_a')
     plt.legend()
     plt.show()

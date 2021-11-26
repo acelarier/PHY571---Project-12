@@ -13,6 +13,7 @@ import time
 
 
 class testBench:
+    """class able to run multiple simulations successively"""
 
     def __init__(self, metadatas , basePath) :
         self.mds = metadatas
@@ -26,7 +27,7 @@ class testBench:
         self.stop_time = -1
         self.runtimes = np.array([-1 for i in range(self.total_runs)])
 
-        #self.sim = Simulation()
+        #self.syst = ParticleSystem()
 
     def setPath(self, newBasePath) :
         self.basePath = newBasePath
@@ -38,7 +39,13 @@ class testBench:
         print('\nProgress : %d/%d\n'%(self.current_run,self.total_runs))
 
     def run(self, verbSim=False) :
-
+        """execute the simulations for the ParticleSystem described in metadatas
+no initCondition are indicated for the moment
+Runs as followed :
+    1 : reads a line from 'metadatas' and builds the corresponding ParticleSystem object ('.syst')
+    2 : initialises the ParticleSystem
+    3 : executes the simulation on it
+    4 : saves the results with a specified data format : [basePath + '_sim' + run number]_data.npy and [basePath + '_sim' + run number]_meta.npy"""
         self.current_run = 0
         for i in range(self.total_runs) :
             N = int(self.mds[i,0])
@@ -47,17 +54,17 @@ class testBench:
             speed = self.mds[i,3]
             n_step = int(self.mds[i,4])
 
-            self.sim = Simulation(N, L, noise, speed)
-            self.sim.initialise() # eventually add an input possibility for this function to always start with the same distribution...
+            self.syst = ParticleSystem(N, L, noise, speed)
+            self.syst.initialise() # eventually add an input possibility for this function to always start with the same distribution...
 
             self.start_time = time.time()
-            data, meta = self.sim.run(n_step, verbose=verbSim)
+            data, meta = self.syst.simulate(n_step, verbose=verbSim)
             self.stop_time = time.time()
             self.runtimes[i] = self.stop_time - self.start_time
             self.current_run += 1
             self.showProgress()
 
-            exportData(data, meta, self.basePath + '_run' + str(i))
+            exportData(data, meta, self.basePath + '_sim' + str(i))
 
 
 
@@ -70,6 +77,7 @@ class testBench:
 ## executable code
 
 def testingTheTestBench() :
+    """execute the simulations specified in the built-in variable 'testNoise'"""
     testNoise = np.array([[100, 5, 5*(i+1)/30, 0.03, 10000] for i in range(30)])
     basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/100p_long_run'
     bench = testBench(testNoise, basePath)
@@ -78,6 +86,13 @@ def testingTheTestBench() :
 
 
 def oneTrial() :
+    """execute a single simulation specified by the built-in variables 'N', 'L', 'noise', 'speed', 'n_step'
+default values :
+    N = 300
+    L = 25
+    noise = 0.1
+    speed = 0.03
+    n_step = 30"""
     N = 300
     L = 25
     noise = 0.1
@@ -85,17 +100,16 @@ def oneTrial() :
 
     n_step = 30
 
-    sim = Simulation(N, L, noise, speed) # reminder : numberParticles, boxSize, noise, speed
-    print('Simulation créée')
+    print('Building new ParticleSystem')
+    syst = ParticleSystem(N, L, noise, speed) # reminder : numberParticles, boxSize, noise, speed
+    syst.initialise() # initialize a random configuration
 
-    sim.initialise() # initialize a random configuration
-    print('Simulation initialisée. Calcul évolution...')
+    print('ParticleSystem initialised. Running evolution...')
 
 
-    data, metadata = sim.run(n_step, verbose=True)
-    print('Calcul terminé. Affichage...')
+    data, meta = syst.run(n_step, verbose=True)
 
-    displayLines(data, metadata)
+    displayLines(data, meta)
 
 
 

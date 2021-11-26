@@ -6,7 +6,7 @@ all code is taken from the jupyter notebook written by Armelle
 import numpy as np
 import random
 import math
-
+import time
 
 class particle:
     """A class that define a particule (a bird) by its position and oriented speed.
@@ -55,7 +55,7 @@ it is assumed that the time unit between two updates is the unit of time"""
                 self.pos[i]+=self.L
 
 
-class Simulation:
+class ParticleSystem:
     """arg : N, L, noise, speed
 A class that compute a simulation of particules interacting with their neighboors and moving within a box.
 The box has periodic boundary counditions.
@@ -70,11 +70,14 @@ The box has periodic boundary counditions.
         self.particles = list()
 
     def initialise(self) :
-        """generates a random configuration at start"""
+        """generates a random configuration of particles"""
         for i in range(self.N) :
             self.particles.append(particle(np.array([random.uniform(0,self.L), random.uniform(0,self.L)]), self.speed, random.uniform(0,2*np.pi), self.noise, self.L))
 
     def getNeighbors(self, particle):
+        """generates the list of neighbors at less than 1 unit
+enumerates all numbers (complexity = N)
+can be massively improved"""
         neighbors = []
         for i in range(self.N) :
             particle_i = self.particles[i]
@@ -84,18 +87,31 @@ The box has periodic boundary counditions.
         return neighbors
 
     def doStep(self):
+        """engine executing an elementary step"""
         for i in range(self.N):
             neighbors = self.getNeighbors(self.particles[i])
             self.particles[i].updateOrientation(neighbors)
         for i in range(self.N):
             self.particles[i].updatePosition()
 
-    def run(self, n_step, verbose=False) :
-        """data format : np.array, shape = (n_step, n_part, 3) --> [time, particule ID, coordinates]
-                         + an array containing meta data : [N, L, noise, speed, n_step]
-           runs a simulation of n_step and return a numpy array formatted as above"""
+    def simulate(self, n_step, verbose=False) :
+        """runs a simulation of n_step and return a numpy array formatted as above
 
-        if verbose : print('Simulation start...')
+return :
+    'data' --> np.array containing the data, shaped as (n_step, n_part, 3) for [time, particule ID, coordinates]
+    'meta' --> np.array containing metadata, shaped as (5,)                for [N, L, noise, speed, n_step]
+
+example :
+                       x0     y0     theta0  x1     y1     theta1
+    data = np.array([[[1.393, 0.383, 0.000], [1.393, 0.383, 0.000]],       step 0
+                     [[1.393, 0.583, 0.000], [1.393, 0.383, 0.300]],       step 1
+                     [[1.393, 0.783, 0.000], [1.393, 0.383, 0.600]],       step 2
+                     [[1.393, 0.983, 0.000], [1.393, 0.383, 0.900]],       step 3
+                     [[1.393, 1.183, 0.000], [1.393, 0.383, 1.200]]]       step 4"""
+
+        if verbose :
+            print('ParticleSystem start running...')
+            start_time = time.time()
 
         data = np.zeros((n_step, self.N, 3))
 
@@ -109,11 +125,16 @@ The box has periodic boundary counditions.
                 data[t,p,0:2] = self.particles[p].pos
                 data[t,p,2] = self.particles[p].theta
 
-        metadata = np.array([self.N, self.L, self.noise, self.speed, n_step])
+        meta = np.array([self.N, self.L, self.noise, self.speed, n_step])
 
-        if verbose : print('End of simulation')
 
-        return data, metadata
+        if verbose :
+            stop_time = time.time()
+            runtime = stop_time - start_time
+            print('Runtime : %f s'%(runtime))
+            print('End of simulation')
+
+        return data, meta
 
 
 

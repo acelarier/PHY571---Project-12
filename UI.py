@@ -1,8 +1,8 @@
 """
 shows the animation corresponding to a sim data set
 formating :
-    np.array, shape = (n_step, n_part, 3) --> [time, particule ID, coordinates]
-    coordinates --> [x, y, theta]
+    'data' --> np.array containing the data, shaped as (n_step, n_part, 3) for [time, particule ID, coordinates]
+    'meta' --> np.array containing metadata, shaped as (5,)                for [N, L, noise, speed, n_step]
 """
 
 
@@ -19,7 +19,10 @@ import os
 
 
 def genData() :
-    """generates a random sample formated as a simulation result (see headline)"""
+    """generates a random sample formated as a ParticleSystem.simulation() result
+formating :
+    'data' --> np.array containing the data, shaped as (n_step, n_part, 3) for [time, particule ID, coordinates]
+    'meta' --> np.array containing metadata, shaped as (5,)                for [N, L, noise, speed, n_step]"""
     n_step = 100
     n_part = 20
     data = np.zeros((n_step, n_part, 3))
@@ -30,19 +33,19 @@ def genData() :
     return data
 
 
-def exportData(data, metadata, path = None) :
+def exportData(data, meta, path = None) :
     """saves the results of a trial as .npy files :
-    data     --> path + '_data'
-    metadata --> path + '_metadata'"""
+    data --> path + '_data'
+    meta --> path + '_meta'"""
     if path == None :
         current = os.getcwd()
         print('Current directory : ' + current)
         path = str(input('\nEnter path+filename : '))
 
     np.save(path + '_data', data)
-    np.save(path + '_metadata', metadata)
+    np.save(path + '_meta', meta)
 
-    print('\nSimulation results saved as :\n' + path + '_data.npy\n' + path + '_metadata.npy' )
+    print('\nSimulation results saved as :\n' + path + '_data.npy\n' + path + '_meta.npy' )
     return
 
 
@@ -50,7 +53,7 @@ def exportData(data, metadata, path = None) :
 def importData(path = None) :
     """loads the results of a trial as numpy arrays
     ex :
-    for two files named "monday_sim_1_data.npy" and "monday_sim_1_metadata.npy" run : importData('/Users/antoine/Documents/...directories.../monday_sim_1')
+    for two files named "monday_sim_1_data.npy" and "monday_sim_1_meta.npy" simulation : importData('/Users/antoine/Documents/...directories.../monday_sim_1')
     """
 
     if path == None :
@@ -59,9 +62,9 @@ def importData(path = None) :
         path = str(input('\nEnter path+filename : '))
 
     data = np.load(path + '_data.npy')
-    metadata = np.load(path + '_metadata.npy')
-    print('\nLoaded from :\n' + path + '_data.npy\n' + path + '_metadata.npy' )
-    return data, metadata
+    meta = np.load(path + '_meta.npy')
+    print('\nLoaded from :\n' + path + '_data.npy\n' + path + '_meta.npy' )
+    return data, meta
 
 def stop(event):
     global anim
@@ -70,17 +73,19 @@ def stop(event):
     return
 
 
-def displayLines(data, metadata) :
+def displayLines(data, meta) :
+    """displays a simulation with the twenty last positions as lines, for each particle"""
     n_step, n_part = np.shape(data)[0:2]
 
     trace = 20
+    thickness = 0.5
 
     plt.close('all')
     plt.figure(figsize = (5,5))
     fig, ax = plt.subplots()
     plt.grid()
-    lines = [ax.plot(data[0,p,0], data[0,p,1], linewidth = 0.5, color='r')[0] for p in range(n_part)]
-    L = metadata[1]
+    lines = [ax.plot(data[0,p,0], data[0,p,1], linewidth = thickness, color='r')[0] for p in range(n_part)]
+    L = meta[1]
     ax.set_xlim(0,L)
     ax.set_ylim(0,L)
 
@@ -94,14 +99,14 @@ def displayLines(data, metadata) :
     plt.show()
 
 
-def displayPoints(data, metadata) :
-    """displays a run with the five last positions as dots, for each particle"""
+def displayPoints(data, meta) :
+    """displays a simulation with the twenty last positions as dots, for each particle"""
     n_step, n_part = np.shape(data)[0:2]
 
     plt.close('all')
     fig, ax = plt.subplots()
     plt.grid()
-    L = metadata[1]
+    L = meta[1]
     ax.set_xlim(0,L)
     ax.set_ylim(0,L)
 
