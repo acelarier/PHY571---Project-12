@@ -9,41 +9,43 @@ import math
 
 
 class particle:
-    """A class that define a particule (a bird) by his position and oriented speed.
+    """A class that define a particule (a bird) by its position and oriented speed.
         """
 
-    def __init__(self, position, speed, theta, noise, boxSize):
+    def __init__(self, position, speed, theta, noise, L):
         self.pos = position
         self.speed = speed
         self.theta = theta
         self.noise = noise
-        self.L = boxSize
+        self.L = L
 
     def updateOrientation(self, neighbors):
-    #calculus of the average direction of the velocities of particles being within a circle of radius r surrounding the given particle (neighbors).
-        averageNeighborsOrientation = 0
-        neighborsNumber = len(neighbors)
+        """calculus of the average direction of the velocities of particles being within a circle of radius r surrounding the given particle (neighbors)
+periodic boundary conditions are used"""
+        avTheta = 0
+        n_neighbors = len(neighbors)
 
-        """OLD VERSION"""
+        """averarge of theta"""
         for neighbor in neighbors :
-            averageNeighborsOrientation += neighbor.theta
-        averageNeighborsOrientation = averageNeighborsOrientation / neighborsNumber
+            avTheta += neighbor.theta
+        avTheta = avTheta / n_neighbors
 
-        """NEWVERSION"""
+        """cotan (average sin / average cos )"""
         avCos = 0
         avSin = 0
         for neighbor in neighbors :
             avCos += np.cos(neighbor.theta)
             avSin += np.sin(neighbor.theta)
         # avCos & avSin are not normalised because we use only their ratio
-        alternativeAverageNeighborsOrientation = math.atan(avSin/avCos)
+        altAvTheta = math.atan(avSin/avCos)
 
-        self.theta = alternativeAverageNeighborsOrientation + random.uniform(-self.noise/2,self.noise/2)
+        self.theta = altAvTheta + random.uniform(-self.noise/2,self.noise/2)
         self.theta = self.theta%(2*math.pi)
 
 
     def updatePosition(self):
-    #it is assumed that the time unit between two updates is the unit of time.
+        """moves particle at constant speed, with peridodic boundary condition
+it is assumed that the time unit between two updates is the unit of time"""
         self.pos[0]+=np.cos(self.theta)*self.speed
         self.pos[1]+=np.sin(self.theta)*self.speed
         for i in range(2):
@@ -56,7 +58,7 @@ class particle:
 class Simulation:
     """arg : N, L, noise, speed
 A class that compute a simulation of particules interacting with their neighboors and moving within a box.
-    The box has periodic boundary counditions.
+The box has periodic boundary counditions.
         """
 
     def __init__(self, N = 20, L = 7, noise = 0.1, speed = 0.03):
@@ -68,6 +70,7 @@ A class that compute a simulation of particules interacting with their neighboor
         self.particles = list()
 
     def initialise(self) :
+        """generates a random configuration at start"""
         for i in range(self.N) :
             self.particles.append(particle(np.array([random.uniform(0,self.L), random.uniform(0,self.L)]), self.speed, random.uniform(0,2*np.pi), self.noise, self.L))
 
