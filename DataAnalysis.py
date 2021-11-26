@@ -7,7 +7,7 @@ calculate using data, meta
 # change UI.py (see headers in UI.py)
 
 
-# activity : investigation of AverageVelocity on wednesday, 24 nov.
+# activity : investigation of averageVelocity on wednesday, 24 nov.
 
 
 ## toolkit
@@ -16,7 +16,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-def AverageVelocity(data, meta, cut=0):
+
+
+def averageVelocity(data, meta, cut=0):
     """return the average velocity  (between 0 and 1) from the numpy vector data with the formula from ref [02]
 velocity is averaged on particules AND timesteps
 
@@ -26,7 +28,7 @@ optionnal parameter 'cut' (integer) allows to ignore the first <cut> timesteps""
     n_step = meta[4]
 
     if cut >= n_step :
-        print('ERROR in AverageVelocity : too many timesteps were ignored\n')
+        print('ERROR in averageVelocity : too many timesteps were ignored\n')
         return 0., 0.
     print('Velocity averaged on %d out of %d timesteps'%(n_step-cut, n_step))
 
@@ -74,11 +76,15 @@ also builds a sliding average for readability with optionnal parameter smooth
 
 
 
-def speedVersusNoise() :
+def velocityVsNoise(basePath=None) :
     """reads a set of files to plot the average speed as a function of the noise
 the files must have the format defined in testBench.run"""
+    if basePath == None :
+        current = os.getcwd()
+        print('Current directory : ' + current)
+        basePath = str(input('\nEnter path + base pathname : '))
 
-    basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/100p_long_run'
+    #basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/100p_long_run'
     #basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/100 particles/long_run/100p_long_run'
 
     noises = []
@@ -95,7 +101,7 @@ the files must have the format defined in testBench.run"""
             exit = True
         else :
             # each ParticleSystem is processed inloop to keep the cached memory light
-            va, var = AverageVelocity(data, meta)
+            va, var = averageVelocity(data, meta)
             noises.append(meta[2])
             vas.append(va)
             vars.append(var)
@@ -130,10 +136,15 @@ the files must have the format defined in testBench.run"""
 
 
 
-def speedVersusNoiseCut() :
+def velocityVsNoiseVsRelaxation(basePath=None) :
     """reads a set of files to plot the average speed AND the average speed cutted as a function of the noise
 the files must have the format defined in testBench.run"""
-    basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/100p_long_run'
+
+    if basePath == None :
+        current = os.getcwd()
+        print('Current directory : ' + current)
+        basePath = str(input('\nEnter path + base pathname : '))
+    #basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/100p_long_run'
 
     noises = []
     vas = []
@@ -151,13 +162,13 @@ the files must have the format defined in testBench.run"""
             exit = True
         else :
             # each ParticleSystem is processed inloop to keep the cached memory light
-            va, var = AverageVelocity(data, meta, cut=0)
+            va, var = averageVelocity(data, meta, cut=0)
             noises.append(meta[2])
             vas.append(va)
             vars.append(var)
 
             n_step = int(meta[-1])
-            vaCut, varCut = AverageVelocity(data, meta, cut=100)
+            vaCut, varCut = averageVelocity(data, meta, cut=100)
             vasCut.append(vaCut)
             varsCut.append(varCut)
 
@@ -179,22 +190,28 @@ the files must have the format defined in testBench.run"""
     thisLabel = 'N = '+N+', L = '+L # crapy assignment...
     plt.plot(noises, vas, label = 'full timeframe')
     plt.plot(noises, vasCut, label = 'truncated timeframe')
-    plt.fill_between(noises, vasCut-varsCut, vasCut+varsCut, edgecolor='#3F7F4C', facecolor='#3F7F4C', interpolate = True, alpha=0.1, linewidth=0)
+    #plt.fill_between(noises, vasCut-varsCut, vasCut+varsCut, edgecolor='#3F7F4C', facecolor='#3F7F4C', interpolate = True, alpha=0.1, linewidth=0)
 
     plt.xlabel('noise')
     plt.ylabel('average velocity')
     plt.title('Showing the difference with a relaxed situation')
     plt.legend(title=thisLabel)
     plt.show()
+    return
 
 
 
 
 
-def speedVersusTime() :
+def velocityVsTime(basePath=None) :
     """show the smoothed time evolution of v_a for a series of run
 indicate a directory containing the result of a testBench run in the variable 'basePath'"""
-    basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/100p_long_run'
+
+    if basePath == None :
+        current = os.getcwd()
+        print('Current directory : ' + current)
+        basePath = str(input('\nEnter path + base pathname : '))
+    #basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/100p_long_run'
 
     noises = []
     vaSeries = []
@@ -232,3 +249,15 @@ indicate a directory containing the result of a testBench run in the variable 'b
     plt.title('Time evolution of v_a')
     plt.legend()
     plt.show()
+    return
+
+
+
+
+
+## shortcuts
+
+tmpPath = '/Users/antoine/Documents/X/3A/PHY571/tmp/'
+fig2Path = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/'
+longBase = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/100 particles/long_run/100p_long_run'
+

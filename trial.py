@@ -26,17 +26,21 @@ class testBench:
         self.start_time = 0
         self.stop_time = -1
         self.runtimes = np.array([-1 for i in range(self.total_runs)])
+        return
 
         #self.syst = ParticleSystem()
 
     def setPath(self, newBasePath) :
         self.basePath = newBasePath
+        return
 
     def setmetadatas(self, mds) :
         self.metadatas = mds
+        return
 
     def showProgress(self) :
-        print('\nProgress : %d/%d\n'%(self.current_run,self.total_runs))
+        print('\nTest bench progress : %d/%d\n'%(self.current_run,self.total_runs))
+        return
 
     def run(self, verbSim=False) :
         """execute the simulations for the ParticleSystem described in metadatas
@@ -65,6 +69,7 @@ Runs as followed :
             self.showProgress()
 
             exportData(data, meta, self.basePath + '_sim' + str(i))
+        return
 
 
 
@@ -76,16 +81,23 @@ Runs as followed :
 
 ## executable code
 
-def noiseTestBench() :
-    """execute the simulations specified in the built-in variable 'testNoise'"""
-    metas = np.array([[40, 5, 5*(15+i+1)/30, 0.03, 1000] for i in range(3)])
+def noiseTestBench(basePath=None) :
+    """execute the simulations specified in the built-in variable 'testNoise'
+save the results in the specified path"""
+    if basePath == None :
+        current = os.getcwd()
+        print('Current directory : ' + current)
+        basePath = str(input('\nEnter path + base filename : '))
+
+    metas = np.array([[20, 5, 5*(5+i+1)/30, 0.03, 1000] for i in range(3)])
     basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/100p_long_run'
     bench = testBench(metas, basePath)
 
     bench.run(verbSim=True)
+    return
 
 
-def oneshotTestBench() :
+def oneShotTestBench(res=False) :
     """execute a single simulation specified by the built-in variables 'N', 'L', 'noise', 'speed', 'n_step'
 default values :
     N = 300
@@ -100,16 +112,12 @@ default values :
 
     n_step = 30
 
-    print('Building new ParticleSystem')
     syst = ParticleSystem(N, L, noise, speed) # reminder : numberParticles, boxSize, noise, speed
     syst.initialise() # initialize a random configuration
-
-    print('ParticleSystem initialised. Running evolution...')
-
-
     data, meta = syst.simulate(n_step, verbose=True)
-
     displayLines(data, meta)
+    if res : return data, meta
+    return
 
 
 

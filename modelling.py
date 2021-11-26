@@ -20,6 +20,7 @@ class Particle:
         self.theta = theta
         self.noise = noise
         self.L = L
+        return
 
     def updateOrientation(self, neighbors):
         """calculus of the average direction of the velocities of particles being within a circle of radius r surrounding the given particle (neighbors)
@@ -43,6 +44,7 @@ periodic boundary conditions are used"""
 
         self.theta = altAvTheta + random.uniform(-self.noise/2,self.noise/2)
         self.theta = self.theta%(2*math.pi)
+        return
 
 
     def updatePosition(self):
@@ -55,6 +57,7 @@ it is assumed that the time unit between two updates is the unit of time"""
                 self.pos[i]-=self.L
             if self.pos[i]<0 :
                 self.pos[i]+=self.L
+        return
 
 
 class ParticleSystem:
@@ -70,11 +73,13 @@ The box has periodic boundary counditions.
         self.noise = noise
         self.speed = speed
         self.particles = list()
+        return
 
     def initialise(self) :
         """generates a random configuration of particles"""
         for i in range(self.N) :
             self.particles.append(Particle(np.array([random.uniform(0,self.L), random.uniform(0,self.L)]), self.speed, random.uniform(0,2*np.pi), self.noise, self.L))
+        return
 
     def getNeighbors(self, particle):
         """generates the list of neighbors at less than 1 unit
@@ -95,6 +100,7 @@ can be massively improved"""
             self.particles[i].updateOrientation(neighbors)
         for i in range(self.N):
             self.particles[i].updatePosition()
+        return
 
     def simulate(self, n_step, verbose=False) :
         """runs a simulation of n_step and return a numpy array formatted as above

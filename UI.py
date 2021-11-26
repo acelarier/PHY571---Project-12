@@ -47,7 +47,7 @@ def exportData(data, meta, path = None) :
     np.save(path + '_data', data)
     np.save(path + '_meta', meta)
 
-    print('\nSimulation results saved as :\n' + path + '_data.npy\n' + path + '_meta.npy' )
+    print('\nSimulation results saved as :\n    ' + path.rsplit(sep='/')[-1] + '_data.npy\n    ' + path.rsplit(sep='/')[-1] + '_meta.npy' )
     return
 
 
@@ -65,7 +65,7 @@ def importData(path = None) :
 
     data = np.load(path + '_data.npy')
     meta = np.load(path + '_meta.npy')
-    print('\nLoaded from :\n' + path + '_data.npy\n' + path + '_meta.npy' )
+    print('\nLoaded from :\n    ' + path.rsplit(sep='/')[-1] + '_data.npy\n    ' + path.rsplit(sep='/')[-1] + '_meta.npy' )
     return data, meta
 
 def stop(event):
@@ -100,6 +100,8 @@ def displayLines(data, meta) :
     ani = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=200)
     plt.show()
 
+    return
+
 
 def displayPoints(data, meta) :
     """displays a simulation with the twenty last positions as dots, for each particle"""
@@ -131,3 +133,4 @@ def displayPoints(data, meta) :
     anim = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=20)
 
     plt.show()
+    return
