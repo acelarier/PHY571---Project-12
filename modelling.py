@@ -26,8 +26,9 @@ class Particle:
         """calculus of the average direction of the velocities of particles being within a circle of radius r surrounding the given particle (neighbors)
 periodic boundary conditions are used"""
         avTheta = 0
+        ngb=True
         n_neighbors = len(neighbors)
-
+        if n_neighbors==0 : ngb=False
         if n_neighbors > 0 :
             """averarge of theta"""
             for neighbor in neighbors :
@@ -45,7 +46,7 @@ periodic boundary conditions are used"""
 
             self.theta = altAvTheta + random.uniform(-self.noise/2,self.noise/2)
             self.theta = self.theta%(2*math.pi)
-        return
+        return ngb
 
 
     def updatePosition(self):
@@ -155,8 +156,7 @@ class FastParticle(Particle):
 
     def __init__(self, position, speed, theta, noise, L):
         Particle.__init__(self, position, speed, theta, noise, L)
-        self.closeNeighbors = [[],[]]
-        self.head = 0
+        self.closeNeighbors = []
         return
 
 
@@ -170,7 +170,6 @@ class FastParticleSystem(ParticleSystem):
         else :
             self.farRange = farRange
         self.countdown = 0
-        self.heads = 0
         return
 
     def initialise(self) :
@@ -197,17 +196,16 @@ class FastParticleSystem(ParticleSystem):
 
     def getNeighbors(self, particle) :
         # updating pools
-        i = 1-self.heads
         if self.countdown == 0 :
-            particle.closeNeighbors[i].clear()
+            particle.closeNeighbors.clear()
             for part in self.particles :
                 distance = np.linalg.norm(part.pos - particle.pos)
                 lowerBound = np.floor((distance-1)/(2*self.speed)) # 1 stands as the radius here
                 if lowerBound < self.farRange :
-                    particle.closeNeighbors[i].append(part)
+                    particle.closeNeighbors.append(part)
         # calculating the neighbors
         neighbors = []
-        for close_one in particle.closeNeighbors[i] :
+        for close_one in particle.closeNeighbors :
             distance = np.linalg.norm(close_one.pos - particle.pos)
             if distance < self.R :
                 neighbors.append(close_one)
@@ -217,14 +215,15 @@ class FastParticleSystem(ParticleSystem):
 
     def doStep(self):
         """engine executing an elementary step"""
+        problem=False
         for i in range(self.N):
             neighbors = self.getNeighbors(self.particles[i])
-            self.particles[i].updateOrientation(neighbors)
+            ok = self.particles[i].updateOrientation(neighbors)
+            if not ok : print('no neighbors while countdown = %d'%(self.countdown))
         for i in range(self.N):
             self.particles[i].updatePosition()
         if self.countdown == 0 :
             self.countdown = self.farRange
-            self.heads = 1-self.heads
         self.countdown -= 1
         return
 

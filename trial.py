@@ -105,12 +105,12 @@ default values :
     noise = 0.1
     speed = 0.03
     n_step = 30"""
-    N = 300
+    N = 100
     L = 25
     noise = 0.1
     speed = 0.03
 
-    n_step = 30
+    n_step = 90
 
     syst = ParticleSystem(N, L, noise, speed) # reminder : numberParticles, boxSize, noise, speed
     syst.initialise() # initialize a random configuration
@@ -121,7 +121,7 @@ default values :
 
 
 
-def oneShotTestBenchFastParticle(res=False) :
+def oneShotTestBenchFastParticle(res=False, _farRange=10) :
     """execute a single simulation specified by the built-in variables 'N', 'L', 'noise', 'speed', 'n_step'
 default values :
     N = 300
@@ -129,14 +129,15 @@ default values :
     noise = 0.1
     speed = 0.03
     n_step = 30"""
-    N = 300
+    N = 100
     L = 25
     noise = 0.1
     speed = 0.03
+    farRange = _farRange
 
-    n_step = 30
+    n_step = 90
 
-    syst = FastParticleSystem(N, L, noise, speed, farRange=10) # reminder : numberParticles, boxSize, noise, speed
+    syst = FastParticleSystem(N, L, noise, speed, farRange) # reminder : numberParticles, boxSize, noise, speed
     syst.initialise() # initialize a random configuration
     data, meta = syst.simulate(n_step, verbose=True)
     displayLines(data, meta)

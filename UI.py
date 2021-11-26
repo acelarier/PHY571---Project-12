@@ -97,7 +97,7 @@ def displayLines(data, meta) :
             lines[p].set_data(data[start:t,p,0],data[start:t,p,1])
         return lines
 
-    ani = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=200)
+    ani = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=20)
     plt.show()
 
     return
