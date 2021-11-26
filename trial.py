@@ -12,12 +12,13 @@ import time
 
 
 
-class testBench:
+class TestBench:
     """class able to run multiple simulations successively"""
 
-    def __init__(self, metadatas , basePath) :
+    def __init__(self, metadatas , basePath, fast=False) :
         self.mds = metadatas
         self.basePath = basePath
+        self.fast = fast
 
         self.total_runs = len(metadatas)
         self.current_run = -1
@@ -58,7 +59,8 @@ Runs as followed :
             speed = self.mds[i,3]
             n_step = int(self.mds[i,4])
 
-            self.syst = ParticleSystem(N, L, noise, speed)
+            if self.fast : self.syst = FastParticleSystem(N, L, noise, speed)
+            else : self.syst = ParticleSystem(N, L, noise, speed)
             self.syst.initialise() # eventually add an input possibility for this function to always start with the same distribution...
 
             self.start_time = time.time()
@@ -78,10 +80,9 @@ Runs as followed :
 
 
 
-
 ## executable code
 
-def noiseTestBench(basePath=None) :
+def noiseTestBench(basePath=None, fast=False) :
     """execute the simulations specified in the built-in variable 'testNoise'
 save the results in the specified path"""
     if basePath == None :
@@ -89,9 +90,8 @@ save the results in the specified path"""
         print('Current directory : ' + current)
         basePath = str(input('\nEnter path + base filename : '))
 
-    metas = np.array([[20, 5, 5*(5+i+1)/30, 0.03, 1000] for i in range(3)])
-    basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/100p_long_run'
-    bench = testBench(metas, basePath)
+    metas = np.array([[40, 5, 5*(5+i+1)/30, 0.03, 1000] for i in range(3)])
+    bench = TestBench(metas, basePath, fast)
 
     bench.run(verbSim=True)
     return
@@ -121,7 +121,7 @@ default values :
 
 
 
-def oneShotTestBenchFastParticle(res=False, _farRange=10) :
+def oneShotTestBenchFastParticle(res=False, _farRange=10, noShow=False) :
     """execute a single simulation specified by the built-in variables 'N', 'L', 'noise', 'speed', 'n_step'
 default values :
     N = 300
@@ -140,7 +140,7 @@ default values :
     syst = FastParticleSystem(N, L, noise, speed, farRange) # reminder : numberParticles, boxSize, noise, speed
     syst.initialise() # initialize a random configuration
     data, meta = syst.simulate(n_step, verbose=True)
-    displayLines(data, meta)
+    if not noShow : displayLines(data, meta)
     if res : return data, meta
     return
 

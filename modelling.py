@@ -11,6 +11,9 @@ import time
 ## toolkit
 
 
+
+
+
 class Particle:
     """A class that define a particule (a bird) by its position and oriented speed."""
 
@@ -178,23 +181,12 @@ class FastParticleSystem(ParticleSystem):
             self.particles.append(FastParticle(np.array([random.uniform(0,self.L), random.uniform(0,self.L)]), self.speed, random.uniform(0,2*np.pi), self.noise, self.L))
         return
 
-    def printState(self) :
-        """for handyness purpose only"""
-        print('FastParticuleSystem state :')
-        print('N = %d, L = %d, farRange = %f'%(self.N, self.L, self.farRange))
-        try :
-            for i in range(3) :
-                x = self.particles[i].pos[0]
-                y = self.particles[i].pos[1]
-                theta = self.particles[i].theta
-                n = len(self.particles[i].closeNeighbors[self.heads])
-                print('particle %d : pos = [%f,%f], theta = %f, number of neighbors = %d'%(i,x,y,theta,n))
-        except :
-            print('Value not yet defined')
-        print('')
-        return
 
     def getNeighbors(self, particle) :
+        """return the exact neighbors of a given particle
+AT EACH STEP : look for neighbors in 'particle.closeNeihbors'
+WHEN 'countdown' goes to 0 : updates 'particle.closeNeihbors'
+this method can make the function up to x10 faster"""
         # updating pools
         if self.countdown == 0 :
             particle.closeNeighbors.clear()
@@ -230,24 +222,32 @@ class FastParticleSystem(ParticleSystem):
 
 
 
+
+
+
 ## executable code
 
+
+
+
+
 def investigate() :
+    """for testing purpose only"""
     r=10
 
     syst = FastParticleSystem(farRange=r)
     syst.initialise()
 
 
-    syst.printState()
+    printState(syst)
     syst.doStep()
-    syst.printState()
+    printState(syst)
     for i in range(r) :
         syst.doStep()
-    syst.printState()
+    printState(syst)
     for i in range(r) :
         syst.doStep()
-    syst.printState()
+    printState(syst)
 
 
     print('total step done = %d'%(2*r+2))
