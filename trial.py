@@ -121,5 +121,28 @@ default values :
 
 
 
+def oneShotTestBenchFastParticle(res=False) :
+    """execute a single simulation specified by the built-in variables 'N', 'L', 'noise', 'speed', 'n_step'
+default values :
+    N = 300
+    L = 25
+    noise = 0.1
+    speed = 0.03
+    n_step = 30"""
+    N = 300
+    L = 25
+    noise = 0.1
+    speed = 0.03
+
+    n_step = 30
+
+    syst = FastParticleSystem(N, L, noise, speed, farRange=10) # reminder : numberParticles, boxSize, noise, speed
+    syst.initialise() # initialize a random configuration
+    data, meta = syst.simulate(n_step, verbose=True)
+    displayLines(data, meta)
+    if res : return data, meta
+    return
+
+
 
 

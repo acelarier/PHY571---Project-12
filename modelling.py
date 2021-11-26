@@ -230,6 +230,9 @@ class FastParticleSystem(ParticleSystem):
 
 
 
+
+## executable code
+
 def investigate() :
     r=10
 
