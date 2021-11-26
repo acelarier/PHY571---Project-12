@@ -28,22 +28,23 @@ periodic boundary conditions are used"""
         avTheta = 0
         n_neighbors = len(neighbors)
 
-        """averarge of theta"""
-        for neighbor in neighbors :
-            avTheta += neighbor.theta
-        avTheta = avTheta / n_neighbors
+        if n_neighbors > 0 :
+            """averarge of theta"""
+            for neighbor in neighbors :
+                avTheta += neighbor.theta
+            avTheta = avTheta / n_neighbors
 
-        """cotan (average sin / average cos )"""
-        avCos = 0
-        avSin = 0
-        for neighbor in neighbors :
-            avCos += np.cos(neighbor.theta)
-            avSin += np.sin(neighbor.theta)
-        # avCos & avSin are not normalised because we use only their ratio
-        altAvTheta = math.atan(avSin/avCos)
+            """cotan (average sin / average cos )"""
+            avCos = 0
+            avSin = 0
+            for neighbor in neighbors :
+                avCos += np.cos(neighbor.theta)
+                avSin += np.sin(neighbor.theta)
+            # avCos & avSin are not normalised because we use only their ratio
+            altAvTheta = math.atan(avSin/avCos)
 
-        self.theta = altAvTheta + random.uniform(-self.noise/2,self.noise/2)
-        self.theta = self.theta%(2*math.pi)
+            self.theta = altAvTheta + random.uniform(-self.noise/2,self.noise/2)
+            self.theta = self.theta%(2*math.pi)
         return
 
 
@@ -59,15 +60,6 @@ it is assumed that the time unit between two updates is the unit of time"""
                 self.pos[i]+=self.L
         return
 
-
-class fastParticle(Particle):
-    """This classe is based on the 'Particle' class. It adds a two-staged neighbors calculator"""
-
-    def __init__(self, position, speed, theta, noise, L):
-        Particle.__init__(self, position, speed, theta, noise, L)
-        self.closeNeighbors = list()
-        self.farNeighbors = list()
-        return
 
 
 
@@ -158,4 +150,103 @@ example :
         return data, meta
 
 
+class FastParticle(Particle):
+    """This classe is based on the 'Particle' class. It adds a two-staged neighbors calculator"""
 
+    def __init__(self, position, speed, theta, noise, L):
+        Particle.__init__(self, position, speed, theta, noise, L)
+        self.closeNeighbors = [[],[]]
+        self.head = 0
+        return
+
+
+
+class FastParticleSystem(ParticleSystem):
+
+    def __init__(self,  N = 60, L = 7, noise = 0.1, speed = 0.03, farRange=None) :
+        ParticleSystem.__init__(self, N, L, noise, speed)
+        if farRange == None :
+            self.farRange = int(speed**-1) # number of timesteps neccessary to cross a full radius
+        else :
+            self.farRange = farRange
+        self.countdown = 0
+        self.heads = 0
+        return
+
+    def initialise(self) :
+        """generates a random configuration of particles"""
+        for i in range(self.N) :
+            self.particles.append(FastParticle(np.array([random.uniform(0,self.L), random.uniform(0,self.L)]), self.speed, random.uniform(0,2*np.pi), self.noise, self.L))
+        return
+
+    def printState(self) :
+        """for handyness purpose only"""
+        print('FastParticuleSystem state :')
+        print('N = %d, L = %d, farRange = %f'%(self.N, self.L, self.farRange))
+        try :
+            for i in range(3) :
+                x = self.particles[i].pos[0]
+                y = self.particles[i].pos[1]
+                theta = self.particles[i].theta
+                n = len(self.particles[i].closeNeighbors[self.heads])
+                print('particle %d : pos = [%f,%f], theta = %f, number of neighbors = %d'%(i,x,y,theta,n))
+        except :
+            print('Value not yet defined')
+        print('')
+        return
+
+    def getNeighbors(self, particle) :
+        # updating pools
+        i = 1-self.heads
+        if self.countdown == 0 :
+            particle.closeNeighbors[i].clear()
+            for part in self.particles :
+                distance = np.linalg.norm(part.pos - particle.pos)
+                lowerBound = np.floor((distance-1)/(2*self.speed)) # 1 stands as the radius here
+                if lowerBound < self.farRange :
+                    particle.closeNeighbors[i].append(part)
+        # calculating the neighbors
+        neighbors = []
+        for close_one in particle.closeNeighbors[i] :
+            distance = np.linalg.norm(close_one.pos - particle.pos)
+            if distance < self.R :
+                neighbors.append(close_one)
+        return neighbors
+
+
+
+    def doStep(self):
+        """engine executing an elementary step"""
+        for i in range(self.N):
+            neighbors = self.getNeighbors(self.particles[i])
+            self.particles[i].updateOrientation(neighbors)
+        for i in range(self.N):
+            self.particles[i].updatePosition()
+        if self.countdown == 0 :
+            self.countdown = self.farRange
+            self.heads = 1-self.heads
+        self.countdown -= 1
+        return
+
+
+
+def investigate() :
+    r=10
+
+    syst = FastParticleSystem(farRange=r)
+    syst.initialise()
+
+
+    syst.printState()
+    syst.doStep()
+    syst.printState()
+    for i in range(r) :
+        syst.doStep()
+    syst.printState()
+    for i in range(r) :
+        syst.doStep()
+    syst.printState()
+
+
+    print('total step done = %d'%(2*r+2))
+    return
