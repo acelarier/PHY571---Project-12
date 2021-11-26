@@ -97,7 +97,7 @@ def displayLines(data, meta) :
             lines[p].set_data(data[start:t,p,0],data[start:t,p,1])
         return lines
 
-    ani = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=200)
+    ani = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=20)
     plt.show()
 
     return
@@ -134,3 +134,33 @@ def displayPoints(data, meta) :
 
     plt.show()
     return
+
+
+
+
+
+def printState(syst) :
+    """for handyness purpose only, useless otherwise"""
+    print('FastParticuleSystem state :')
+    print('N = %d, L = %d, farRange = %f'%(syst.N, syst.L, syst.farRange))
+    try :
+        for i in range(3) :
+            x = syst.particles[i].pos[0]
+            y = syst.particles[i].pos[1]
+            theta = syst.particles[i].theta
+            n = len(syst.particles[i].closeNeighbors[syst.heads])
+            print('particle %d : pos = [%f,%f], theta = %f, number of neighbors = %d'%(i,x,y,theta,n))
+    except :
+        print('Value not yet defined')
+    print('')
+    return
+
+
+
+
+## shortcuts
+
+tmpPath = '/Users/antoine/Documents/X/3A/PHY571/tmp/'
+fig2Path = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/'
+longBase = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/100 particles/long_run/100p_long_run'
+

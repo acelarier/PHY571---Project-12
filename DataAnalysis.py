@@ -252,12 +252,3 @@ indicate a directory containing the result of a testBench run in the variable 'b
     return
 
 
-
-
-
-## shortcuts
-
-tmpPath = '/Users/antoine/Documents/X/3A/PHY571/tmp/'
-fig2Path = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/'
-longBase = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/100 particles/long_run/100p_long_run'
-

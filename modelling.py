@@ -11,6 +11,9 @@ import time
 ## toolkit
 
 
+
+
+
 class Particle:
     """A class that define a particule (a bird) by its position and oriented speed."""
 
@@ -26,25 +29,27 @@ class Particle:
         """calculus of the average direction of the velocities of particles being within a circle of radius r surrounding the given particle (neighbors)
 periodic boundary conditions are used"""
         avTheta = 0
+        ngb=True
         n_neighbors = len(neighbors)
+        if n_neighbors==0 : ngb=False
+        if n_neighbors > 0 :
+            """averarge of theta"""
+            for neighbor in neighbors :
+                avTheta += neighbor.theta
+            avTheta = avTheta / n_neighbors
 
-        """averarge of theta"""
-        for neighbor in neighbors :
-            avTheta += neighbor.theta
-        avTheta = avTheta / n_neighbors
+            """cotan (average sin / average cos )"""
+            avCos = 0
+            avSin = 0
+            for neighbor in neighbors :
+                avCos += np.cos(neighbor.theta)
+                avSin += np.sin(neighbor.theta)
+            # avCos & avSin are not normalised because we use only their ratio
+            altAvTheta = math.atan(avSin/avCos)
 
-        """cotan (average sin / average cos )"""
-        avCos = 0
-        avSin = 0
-        for neighbor in neighbors :
-            avCos += np.cos(neighbor.theta)
-            avSin += np.sin(neighbor.theta)
-        # avCos & avSin are not normalised because we use only their ratio
-        altAvTheta = math.atan(avSin/avCos)
-
-        self.theta = altAvTheta + random.uniform(-self.noise/2,self.noise/2)
-        self.theta = self.theta%(2*math.pi)
-        return
+            self.theta = altAvTheta + random.uniform(-self.noise/2,self.noise/2)
+            self.theta = self.theta%(2*math.pi)
+        return ngb
 
 
     def updatePosition(self):
@@ -58,6 +63,10 @@ it is assumed that the time unit between two updates is the unit of time"""
             if self.pos[i]<0 :
                 self.pos[i]+=self.L
         return
+
+
+
+
 
 
 class ParticleSystem:
@@ -145,4 +154,101 @@ example :
         return data, meta
 
 
+class FastParticle(Particle):
+    """This classe is based on the 'Particle' class. It adds a two-staged neighbors calculator"""
 
+    def __init__(self, position, speed, theta, noise, L):
+        Particle.__init__(self, position, speed, theta, noise, L)
+        self.closeNeighbors = []
+        return
+
+
+
+class FastParticleSystem(ParticleSystem):
+
+    def __init__(self,  N = 60, L = 7, noise = 0.1, speed = 0.03, farRange=None) :
+        ParticleSystem.__init__(self, N, L, noise, speed)
+        if farRange == None :
+            self.farRange = int(speed**-1) # number of timesteps neccessary to cross a full radius
+        else :
+            self.farRange = farRange
+        self.countdown = 0
+        return
+
+    def initialise(self) :
+        """generates a random configuration of particles"""
+        for i in range(self.N) :
+            self.particles.append(FastParticle(np.array([random.uniform(0,self.L), random.uniform(0,self.L)]), self.speed, random.uniform(0,2*np.pi), self.noise, self.L))
+        return
+
+
+    def getNeighbors(self, particle) :
+        """return the exact neighbors of a given particle
+AT EACH STEP : look for neighbors in 'particle.closeNeihbors'
+WHEN 'countdown' goes to 0 : updates 'particle.closeNeihbors'
+this method can make the function up to x10 faster"""
+        # updating pools
+        if self.countdown == 0 :
+            particle.closeNeighbors.clear()
+            for part in self.particles :
+                distance = np.linalg.norm(part.pos - particle.pos)
+                lowerBound = np.floor((distance-1)/(2*self.speed)) # 1 stands as the radius here
+                if lowerBound < self.farRange :
+                    particle.closeNeighbors.append(part)
+        # calculating the neighbors
+        neighbors = []
+        for close_one in particle.closeNeighbors :
+            distance = np.linalg.norm(close_one.pos - particle.pos)
+            if distance < self.R :
+                neighbors.append(close_one)
+        return neighbors
+
+
+
+    def doStep(self):
+        """engine executing an elementary step"""
+        problem=False
+        for i in range(self.N):
+            neighbors = self.getNeighbors(self.particles[i])
+            ok = self.particles[i].updateOrientation(neighbors)
+            if not ok : print('no neighbors while countdown = %d'%(self.countdown))
+        for i in range(self.N):
+            self.particles[i].updatePosition()
+        if self.countdown == 0 :
+            self.countdown = self.farRange
+        self.countdown -= 1
+        return
+
+
+
+
+
+
+
+## executable code
+
+
+
+
+
+def investigate() :
+    """for testing purpose only"""
+    r=10
+
+    syst = FastParticleSystem(farRange=r)
+    syst.initialise()
+
+
+    printState(syst)
+    syst.doStep()
+    printState(syst)
+    for i in range(r) :
+        syst.doStep()
+    printState(syst)
+    for i in range(r) :
+        syst.doStep()
+    printState(syst)
+
+
+    print('total step done = %d'%(2*r+2))
+    return
