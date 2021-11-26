@@ -60,6 +60,19 @@ it is assumed that the time unit between two updates is the unit of time"""
         return
 
 
+class fastParticle(Particle):
+    """This classe is based on the 'Particle' class. It adds a two-staged neighbors calculator"""
+
+    def __init__(self, position, speed, theta, noise, L):
+        Particle.__init__(self, position, speed, theta, noise, L)
+        self.closeNeighbors = list()
+        self.farNeighbors = list()
+        return
+
+
+
+
+
 class ParticleSystem:
     """arg : N, L, noise, speed
 A class that compute a simulation of particules interacting with their neighboors and moving within a box.
