@@ -25,6 +25,11 @@ optionnal parameter 'cut' (integer) allows to ignore the first <cut> timesteps""
     N = meta[0]
     n_step = meta[4]
 
+    if cut >= n_step :
+        print('ERROR in AverageVelocity : too many timesteps were ignored\n')
+        return 0., 0.
+    print('Velocity averaged on %d out of %d timesteps'%(n_step-cut, n_step))
+
     Cos = np.cos(data[:, :, 2])
     Sin = np.sin(data[:, :, 2])
     SumCos = np.sum(Cos, axis=1)
@@ -69,12 +74,12 @@ also builds a sliding average for readability with optionnal parameter smooth
 
 
 
-def upgradedTesting() :
+def speedVersusNoise() :
     """reads a set of files to plot the average speed as a function of the noise
 the files must have the format defined in testBench.run"""
 
-    #basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/100p_long_run'
-    basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/100 particles/long_run/100p_long_run'
+    basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/100p_long_run'
+    #basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/100 particles/long_run/100p_long_run'
 
     noises = []
     vas = []
@@ -125,7 +130,7 @@ the files must have the format defined in testBench.run"""
 
 
 
-def testingRelaxation() :
+def speedVersusNoiseCut() :
     """reads a set of files to plot the average speed AND the average speed cutted as a function of the noise
 the files must have the format defined in testBench.run"""
     basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/100p_long_run'
@@ -152,7 +157,7 @@ the files must have the format defined in testBench.run"""
             vars.append(var)
 
             n_step = int(meta[-1])
-            vaCut, varCut = AverageVelocity(data, meta, cut=0.1)
+            vaCut, varCut = AverageVelocity(data, meta, cut=100)
             vasCut.append(vaCut)
             varsCut.append(varCut)
 
@@ -172,22 +177,22 @@ the files must have the format defined in testBench.run"""
 
 
     thisLabel = 'N = '+N+', L = '+L # crapy assignment...
-    plt.plot(noises, vas, label = thisLabel + ' unrelaxed')
-    plt.plot(noises, vasCut, label = thisLabel + ' relaxed (cut)')
+    plt.plot(noises, vas, label = 'full timeframe')
+    plt.plot(noises, vasCut, label = 'truncated timeframe')
     plt.fill_between(noises, vasCut-varsCut, vasCut+varsCut, edgecolor='#3F7F4C', facecolor='#3F7F4C', interpolate = True, alpha=0.1, linewidth=0)
 
     plt.xlabel('noise')
     plt.ylabel('average velocity')
     plt.title('Showing the difference with a relaxed situation')
-    plt.legend()
+    plt.legend(title=thisLabel)
     plt.show()
 
 
 
 
 
-def showingRelaxation() :
-    """show the time evolution of v_a for a series of run
+def speedVersusTime() :
+    """show the smoothed time evolution of v_a for a series of run
 indicate a directory containing the result of a testBench run in the variable 'basePath'"""
     basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/100p_long_run'
 
@@ -204,7 +209,7 @@ indicate a directory containing the result of a testBench run in the variable 'b
             exit = True
         else :
             # each ParticleSystem is processed inloop to keep the cached memory light
-            va = timeSeries(data, meta)[1]
+            va = timeSeries(data, meta)[1] #(...)[1] for smoothing !
             noises.append(meta[2])
             vaSeries.append(va)
         i += 1
@@ -223,7 +228,7 @@ indicate a directory containing the result of a testBench run in the variable 'b
     plt.xlabel('step')
     plt.ylabel('average velocity')
     plt.ylim(0,1)
-    plt.grid()
+    plt.grid(ls='--', lw=0.5)
     plt.title('Time evolution of v_a')
     plt.legend()
     plt.show()

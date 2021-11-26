@@ -17,6 +17,8 @@ import os
 
 
 
+## toolkit
+
 
 def genData() :
     """generates a random sample formated as a ParticleSystem.simulation() result
@@ -83,7 +85,7 @@ def displayLines(data, meta) :
     plt.close('all')
     plt.figure(figsize = (5,5))
     fig, ax = plt.subplots()
-    plt.grid()
+    plt.grid(ls='--', lw=0.5)
     lines = [ax.plot(data[0,p,0], data[0,p,1], linewidth = thickness, color='r')[0] for p in range(n_part)]
     L = meta[1]
     ax.set_xlim(0,L)
@@ -105,7 +107,7 @@ def displayPoints(data, meta) :
 
     plt.close('all')
     fig, ax = plt.subplots()
-    plt.grid()
+    plt.grid(ls='--', lw=0.5)
     L = meta[1]
     ax.set_xlim(0,L)
     ax.set_ylim(0,L)
@@ -129,23 +131,3 @@ def displayPoints(data, meta) :
     anim = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=20)
 
     plt.show()
-
-
-
-
-""" usefull for later
-
-
-    def frame(i):
-        start=max((i-5,0))
-        for p in range(n_part) :
-            lines[p].set_data(data[start:i,p,0],data[start:i,p,1])
-        return lines
-
-
-    button = Button(plt.axes([0.8, 0.025, 0.1, 0.04]), 'Stop', color='g', hovercolor='0.975')
-    button.on_clicked(stop)
-
-
-button.on_clicked(reset)
-"""

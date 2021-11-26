@@ -1,6 +1,5 @@
 """
 classes and functions used to model the situation described in [02]
-all code is taken from the jupyter notebook written by Armelle
 """
 
 import numpy as np
@@ -8,9 +7,12 @@ import random
 import math
 import time
 
-class particle:
-    """A class that define a particule (a bird) by its position and oriented speed.
-        """
+
+## toolkit
+
+
+class Particle:
+    """A class that define a particule (a bird) by its position and oriented speed."""
 
     def __init__(self, position, speed, theta, noise, L):
         self.pos = position
@@ -72,7 +74,7 @@ The box has periodic boundary counditions.
     def initialise(self) :
         """generates a random configuration of particles"""
         for i in range(self.N) :
-            self.particles.append(particle(np.array([random.uniform(0,self.L), random.uniform(0,self.L)]), self.speed, random.uniform(0,2*np.pi), self.noise, self.L))
+            self.particles.append(Particle(np.array([random.uniform(0,self.L), random.uniform(0,self.L)]), self.speed, random.uniform(0,2*np.pi), self.noise, self.L))
 
     def getNeighbors(self, particle):
         """generates the list of neighbors at less than 1 unit

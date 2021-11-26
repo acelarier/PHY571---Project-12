@@ -76,16 +76,16 @@ Runs as followed :
 
 ## executable code
 
-def testingTheTestBench() :
+def noiseTestBench() :
     """execute the simulations specified in the built-in variable 'testNoise'"""
-    testNoise = np.array([[100, 5, 5*(i+1)/30, 0.03, 10000] for i in range(30)])
+    metas = np.array([[40, 5, 5*(15+i+1)/30, 0.03, 1000] for i in range(3)])
     basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/100p_long_run'
-    bench = testBench(testNoise, basePath)
+    bench = testBench(metas, basePath)
 
     bench.run(verbSim=True)
 
 
-def oneTrial() :
+def oneshotTestBench() :
     """execute a single simulation specified by the built-in variables 'N', 'L', 'noise', 'speed', 'n_step'
 default values :
     N = 300
@@ -107,7 +107,7 @@ default values :
     print('ParticleSystem initialised. Running evolution...')
 
 
-    data, meta = syst.run(n_step, verbose=True)
+    data, meta = syst.simulate(n_step, verbose=True)
 
     displayLines(data, meta)
 
