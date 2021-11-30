@@ -22,7 +22,7 @@ class node:
 
 
 
-class particle:
+class particleInField:
     """A class that define a particule (a bird) by his position and oriented speed.
         """
 
@@ -161,7 +161,7 @@ A class that compute a simulation of particules interacting with their neighboor
     def initialise(self) :
         #initialize the particles
         for i in range(self.N) :
-            self.particles.append(particle(np.array([random.uniform(0,self.L), random.uniform(0,self.L)]), self.speed, random.uniform(0,2*np.pi), self.eta, self.L))
+            self.particles.append(particleInField(np.array([random.uniform(0,self.L), random.uniform(0,self.L)]), self.speed, random.uniform(0,2*np.pi), self.eta, self.L))
         #initialize the field
         for i in range(self.L):
             for j in range(self.L):
