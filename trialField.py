@@ -91,7 +91,7 @@ def oneTrial() :
     print('Simulation avec champ initialisée. Calcul évolution...')
 
 
-    data, metadata = sim.run(numberTimeStep)
+    data, meta = sim.run(numberTimeStep)
     print('Calcul terminé. Affichage...')
 
-    displayLines(data, metadata)
+    displayLines(data, meta)
