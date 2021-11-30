@@ -250,6 +250,6 @@ A class that compute a simulation of particules interacting with their neighboor
                 data[t,p,0:2] = self.particles[p].pos
                 data[t,p,2] = self.particles[p].theta
 
-        metadata = np.array([self.N, self.L, self.eta, self.speed, n_step])
+        meta = np.array([self.N, self.L, self.eta, self.speed, n_step])
 
-        return data, metadata
+        return data, meta
