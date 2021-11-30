@@ -132,7 +132,7 @@ default values :
     noise = 0.1
     speed = 0.03
     n_step = 30"""
-    N = 400
+    N = 40
     L = 10
     noise = 1
     speed = 0.03
@@ -141,6 +141,30 @@ default values :
     n_step = 90
 
     syst = FastParticleSystem(N, L, noise, speed, farRange) # reminder : numberParticles, boxSize, noise, speed
+    syst.initialise() # initialize a random configuration
+    data, meta = syst.simulate(n_step, verbose=True)
+    if not noShow : displayLines(data, meta)
+    if res : return data, meta
+    return
+
+
+
+def oneShotTestBenchFieldParticle(res=False, noShow=False) :
+    """execute a single simulation specified by the built-in variables 'N', 'L', 'noise', 'speed', 'n_step'
+default values :
+    N = 300
+    L = 25
+    noise = 0.1
+    speed = 0.03
+    n_step = 30"""
+    N = 400
+    L = 10
+    noise = 1
+    speed = 0.03
+
+    n_step = 200
+
+    syst = ParticleSystemWithField(N, L, noise, speed) # reminder : numberParticles, boxSize, noise, speed
     syst.initialise() # initialize a random configuration
     data, meta = syst.simulate(n_step, verbose=True)
     if not noShow : displayLines(data, meta)
