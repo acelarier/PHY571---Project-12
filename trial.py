@@ -100,77 +100,36 @@ save the results in the specified path"""
     return
 
 
-def oneShotTestBench(res=False) :
-    """execute a single simulation specified by the built-in variables 'N', 'L', 'noise', 'speed', 'n_step'
-default values :
-    N = 300
-    L = 25
-    noise = 0.1
-    speed = 0.03
-    n_step = 30"""
-    N = 40
-    L = 5
-    noise = 0.1
-    speed = 0.03
+def densityTestBench(basePath=None, fast=False, farRange=20) :
+    """execute the simulations specified in the built-in variable 'testNoise'
+save the results in the specified path"""
+    if basePath == None :
+        current = os.getcwd()
+        print('Current directory : ' + current)
+        basePath = str(input('\nEnter path + base filename : '))
 
-    n_step = 500
+    metas = np.array([[rho*400, 20, 3, 0.03, 1000] for rho in range(4)])
+    bench = TestBench(metas, basePath, fast, farRange)
 
-    syst = ParticleSystem(N, L, noise, speed) # reminder : numberParticles, boxSize, noise, speed
-    syst.initialise() # initialize a random configuration
-    data, meta = syst.simulate(n_step, verbose=True)
-    displayLines(data, meta)
-    if res : return data, meta
+    bench.run(verbSim=True)
     return
 
 
 
-def oneShotTestBenchFastParticle(res=False, _farRange=10, noShow=False) :
-    """execute a single simulation specified by the built-in variables 'N', 'L', 'noise', 'speed', 'n_step'
-default values :
-    N = 300
-    L = 25
-    noise = 0.1
-    speed = 0.03
-    n_step = 30"""
-    N = 40
-    L = 10
-    noise = 1
-    speed = 0.03
-    farRange = _farRange
 
-    n_step = 90
+
+
+def oneShotTestBench(N, L, noise, speed, n_step, res=False, _farRange=10, noShow=False) :
+    """execute a single simulation specified by N, L, noise, speed, n_step"""
+    farRange = _farRange
 
     syst = FastParticleSystem(N, L, noise, speed, farRange) # reminder : numberParticles, boxSize, noise, speed
     syst.initialise() # initialize a random configuration
     data, meta = syst.simulate(n_step, verbose=True)
+    va = averageVelocity(data, meta, cut = 100)[0]
+    print('Average velocity : %f'%(va))
     if not noShow : displayLines(data, meta)
     if res : return data, meta
-    return
-
-
-
-def oneShotTestBenchFieldParticle(res=False, noShow=False) :
-    """execute a single simulation specified by the built-in variables 'N', 'L', 'noise', 'speed', 'n_step'
-default values :
-    N = 300
-    L = 25
-    noise = 0.1
-    speed = 0.03
-    n_step = 30"""
-    N = 400
-    L = 10
-    noise = 1
-    speed = 0.03
-
-    n_step = 200
-
-    syst = ParticleSystemWithField(N, L, noise, speed) # reminder : numberParticles, boxSize, noise, speed
-    syst.initialise() # initialize a random configuration
-    data, meta = syst.simulate(n_step, verbose=True)
-    if not noShow : displayLines(data, meta)
-    if res : return data, meta
-    return
-
-
+    return va
 
 

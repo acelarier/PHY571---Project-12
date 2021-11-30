@@ -200,7 +200,7 @@ this method can make the function up to x10 faster"""
         if self.countdown == 0 :
             particle.closeNeighbors.clear()
             for part in self.particles :
-                delta = particle_i.pos - particle.pos
+                delta = part.pos - particle.pos
                 delta[0] = min(delta[0], self.L-delta[0]) # taking into account the peridodic boundary condition...
                 delta[1] = min(delta[1], self.L-delta[1]) # using the minimum
                 distance = np.linalg.norm(delta)
