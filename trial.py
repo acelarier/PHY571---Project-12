@@ -15,10 +15,11 @@ import time
 class TestBench:
     """class able to run multiple simulations successively"""
 
-    def __init__(self, metadatas , basePath, fast=False) :
+    def __init__(self, metadatas , basePath, fast=False, farRange=30) :
         self.mds = metadatas
         self.basePath = basePath
         self.fast = fast
+        self.farRange = farRange
 
         self.total_runs = len(metadatas)
         self.current_run = -1
@@ -59,7 +60,9 @@ Runs as followed :
             speed = self.mds[i,3]
             n_step = int(self.mds[i,4])
 
-            if self.fast : self.syst = FastParticleSystem(N, L, noise, speed)
+            if self.fast :
+                self.syst = FastParticleSystem(N, L, noise, speed, farRange=self.farRange)
+                print('fast')
             else : self.syst = ParticleSystem(N, L, noise, speed)
             self.syst.initialise() # eventually add an input possibility for this function to always start with the same distribution...
 
@@ -82,7 +85,7 @@ Runs as followed :
 
 ## executable code
 
-def noiseTestBench(basePath=None, fast=False) :
+def noiseTestBench(basePath=None, fast=False, farRange=20) :
     """execute the simulations specified in the built-in variable 'testNoise'
 save the results in the specified path"""
     if basePath == None :
@@ -90,8 +93,8 @@ save the results in the specified path"""
         print('Current directory : ' + current)
         basePath = str(input('\nEnter path + base filename : '))
 
-    metas = np.array([[40, 5, 5*(5+i+1)/30, 0.03, 1000] for i in range(3)])
-    bench = TestBench(metas, basePath, fast)
+    metas = np.array([[400, 10, 5*(i+1)/10, 0.03, 1000] for i in range(10)])
+    bench = TestBench(metas, basePath, fast, farRange)
 
     bench.run(verbSim=True)
     return
@@ -129,9 +132,9 @@ default values :
     noise = 0.1
     speed = 0.03
     n_step = 30"""
-    N = 100
-    L = 25
-    noise = 0.1
+    N = 400
+    L = 10
+    noise = 1
     speed = 0.03
     farRange = _farRange
 
