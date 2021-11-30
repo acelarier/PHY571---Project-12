@@ -103,6 +103,37 @@ def displayLines(data, meta) :
     return
 
 
+def displayGoodLines(data, meta) :
+    """displays a simulation with the twenty last positions as lines, for each particle"""
+    n_step, n_part = np.shape(data)[0:2]
+
+    trace = 20
+    thickness = 0.5
+
+    plt.close('all')
+    plt.figure(figsize = (5,5))
+    fig, ax = plt.subplots()
+    plt.grid(ls='--', lw=0.5)
+    lines = [ax.plot(data[0,pp//2,0], data[0,pp//2,1], linewidth = thickness, color='r')[0] for pp in range(2*n_part)]
+    L = meta[1]
+    ax.set_xlim(0,L)
+    ax.set_ylim(0,L)
+
+    def frame(t):
+        start=max((t-trace,0))
+        for p in range(n_part) :
+            deltasX = np.abs(data[start:t-1,p,0]-data[start+1:t,p,0])
+            deltasY = np.abs(data[start:t-1,p,1]-data[start+1:t,p,1])
+            lines[2*p].set_data(data[start:t,p,0],data[start:t,p,1])
+            lines[2*p+1].set_data(data[start:t,p,0],data[start:t,p,1])
+        return lines
+
+    ani = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=20)
+    plt.show()
+
+    return
+
+
 def displayPoints(data, meta) :
     """displays a simulation with the twenty last positions as dots, for each particle"""
     n_step, n_part = np.shape(data)[0:2]
