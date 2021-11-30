@@ -14,6 +14,8 @@ import time
 
 
 
+
+
 class Particle:
     """A class that define a particule (a bird) by its position and oriented speed."""
 
@@ -90,6 +92,10 @@ The box has periodic boundary counditions.
             self.particles.append(Particle(np.array([random.uniform(0,self.L), random.uniform(0,self.L)]), self.speed, random.uniform(0,2*np.pi), self.noise, self.L))
         return
 
+    def periodicDist(self, pos1, pos2) :
+        de
+
+
     def getNeighbors(self, particle):
         """generates the list of neighbors at less than 1 unit
 enumerates all numbers (complexity = N)
@@ -97,7 +103,10 @@ can be massively improved"""
         neighbors = []
         for i in range(self.N) :
             particle_i = self.particles[i]
-            distance = np.linalg.norm(particle_i.pos - particle.pos)
+            delta = particle_i.pos - particle.pos
+            delta[0] = min(delta[0], self.L-delta[0]) # taking into account the peridodic boundary condition...
+            delta[1] = min(delta[1], self.L-delta[1]) # ...using the minimum
+            distance = np.linalg.norm(delta)
             if distance <= self.R :
                 neighbors.append(particle_i)
         return neighbors
@@ -191,7 +200,10 @@ this method can make the function up to x10 faster"""
         if self.countdown == 0 :
             particle.closeNeighbors.clear()
             for part in self.particles :
-                distance = np.linalg.norm(part.pos - particle.pos)
+                delta = particle_i.pos - particle.pos
+                delta[0] = min(delta[0], self.L-delta[0]) # taking into account the peridodic boundary condition...
+                delta[1] = min(delta[1], self.L-delta[1]) # using the minimum
+                distance = np.linalg.norm(delta)
                 lowerBound = np.floor((distance-1)/(2*self.speed)) # 1 stands as the radius here
                 if lowerBound < self.farRange :
                     particle.closeNeighbors.append(part)
@@ -218,6 +230,9 @@ this method can make the function up to x10 faster"""
             self.countdown = self.farRange
         self.countdown -= 1
         return
+
+
+
 
 
 
