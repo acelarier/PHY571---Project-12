@@ -142,7 +142,7 @@ class particleInField:
 
 
 
-class Simulation:
+class SimulationWithField:
     """arg : numberParticles, boxSize, etaNoise, speed
 A class that compute a simulation of particules interacting with their neighboors and moving within a box.
     The box has periodic boundary counditions.
