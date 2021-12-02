@@ -75,35 +75,8 @@ def stop(event):
     return
 
 
+
 def displayLines(data, meta) :
-    """displays a simulation with the twenty last positions as lines, for each particle"""
-    n_step, n_part = np.shape(data)[0:2]
-
-    trace = 20
-    thickness = 0.5
-
-    plt.close('all')
-    plt.figure(figsize = (5,5))
-    fig, ax = plt.subplots()
-    plt.grid(ls='--', lw=0.5)
-    lines = [ax.plot(data[0,p,0], data[0,p,1], linewidth = thickness, color='r')[0] for p in range(n_part)]
-    L = meta[1]
-    ax.set_xlim(0,L)
-    ax.set_ylim(0,L)
-
-    def frame(t):
-        start=max((t-trace,0))
-        for p in range(n_part) :
-            lines[p].set_data(data[start:t,p,0],data[start:t,p,1])
-        return lines
-
-    ani = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=20)
-    plt.show()
-
-    return
-
-
-def displayGoodLines(data, meta) :
     """displays a simulation with the twenty last positions as lines, for each particle"""
     n_step, n_part = np.shape(data)[0:2]
     speed = meta[3]
@@ -117,7 +90,7 @@ def displayGoodLines(data, meta) :
     plt.figure(figsize = (5,5))
     fig, ax = plt.subplots()
     plt.grid(ls='--', lw=0.5)
-    lines = [ax.plot(data[0,pp//layers,0], data[0,pp//layers,1], linewidth = thickness[pp%layers], color=colors[pp%layers])[0] for pp in range(layers*n_part)] #here we plot x2 each line (one 'on top' of the other). If a line crosses a barrier, we use one for each side
+    lines = [ax.plot(data[0,pp//layers,0], data[0,pp//layers,1], linewidth = 0.5, color='b')[0] for pp in range(layers*n_part)] #here we plot x2 each line (one 'on top' of the other). If a line crosses a barrier, we use one for each side
     L = meta[1]
     ax.set_xlim(0,L)
     ax.set_ylim(0,L)
@@ -135,7 +108,7 @@ def displayGoodLines(data, meta) :
                 lines[layers*p+k].set_data(data[cut_steps[k]:cut_steps[k+1],p,0], data[cut_steps[k]:cut_steps[k+1],p,1])
         return lines
 
-    ani = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=200)
+    ani = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=20)
     plt.show()
 
     return
