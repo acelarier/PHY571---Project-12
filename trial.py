@@ -108,8 +108,8 @@ default values :
     noise = 0.1
     speed = 0.03
     n_step = 30"""
-    N = 40
-    L = 5
+    N = 4
+    L = 1
     noise = 0.1
     speed = 0.03
 
@@ -132,13 +132,13 @@ default values :
     noise = 0.1
     speed = 0.03
     n_step = 30"""
-    N = 400
-    L = 10
+    N = 5
+    L = 1
     noise = 1
     speed = 0.03
     farRange = _farRange
 
-    n_step = 90
+    n_step = 400
 
     syst = FastParticleSystem(N, L, noise, speed, farRange) # reminder : numberParticles, boxSize, noise, speed
     syst.initialise() # initialize a random configuration

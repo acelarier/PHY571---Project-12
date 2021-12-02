@@ -108,15 +108,16 @@ def displayGoodLines(data, meta) :
     n_step, n_part = np.shape(data)[0:2]
     speed = meta[3]
 
+    layers = 3
     trace = 20
-    thickness = [1.,0.5]
-    colors = ['r', 'b']
+    thickness = [1.,0.5,0.3]
+    colors = ['r', 'b', 'g']
 
     plt.close('all')
     plt.figure(figsize = (5,5))
     fig, ax = plt.subplots()
     plt.grid(ls='--', lw=0.5)
-    lines = [ax.plot(data[0,pp//2,0], data[0,pp//2,1], linewidth = thickness[pp%2], color=colors[pp%2])[0] for pp in range(2*n_part)] #here we plot x2 each line (one 'on top' of the other). If a line crosses a barrier, we use one for each side
+    lines = [ax.plot(data[0,pp//layers,0], data[0,pp//layers,1], linewidth = thickness[pp%layers], color=colors[pp%layers])[0] for pp in range(layers*n_part)] #here we plot x2 each line (one 'on top' of the other). If a line crosses a barrier, we use one for each side
     L = meta[1]
     ax.set_xlim(0,L)
     ax.set_ylim(0,L)
@@ -124,25 +125,14 @@ def displayGoodLines(data, meta) :
     def frame(t):
         start=max((t-trace,0))
         for p in range(n_part) :
-            deltasX = np.abs(data[start:t-1,p,0]-data[start+1:t,p,0]) > speed + 0.1
-            deltasY = np.abs(data[start:t-1,p,1]-data[start+1:t,p,1]) > speed + 0.1
-            rX = -1
-            for i in range(t-1-start) :
-                if deltasX[i] : #ici on peut mettre speed !
-                    rX = i
-            rY = -1
-            for i in range(t-1-start) :
-                if deltasY[i] : #ici on peut mettre self.speed !
-                    rY = i
-            if rX != -1 :   # il y a un 'saut' horizontal entre la pos d'indice rX et celle d'indice rX+1
-                lines[2*p].set_data(data[start:start+rX+1,p,0],data[start:start+rX+1,p,1])
-                lines[2*p+1].set_data(data[start+rX+1:t,p,0],data[start+rX+1:t,p,1])
-            elif rY != -1 : # idem sur Y
-                lines[2*p].set_data(data[start:start+rY+1,p,0],data[start:start+rY+1,p,1])
-                lines[2*p+1].set_data(data[start+rY+1:t,p,0],data[start+rY+1:t,p,1])
-            else :
-                lines[2*p].set_data(data[start:t,p,0],data[start:t,p,1])
-                lines[2*p+1].set_data(data[start:t,p,0],data[start:t,p,1])
+            cut_steps = [start]
+            for i in range(start+1, t) :
+                if np.abs(data[i-1,p,0]-data[i,p,0]) > speed+0.1 or np.abs(data[i-1,p,1]-data[i,p,1]) > speed+0.1 :
+                    cut_steps.append(i)
+            for i in range(layers+1-len(cut_steps)) :
+                cut_steps.append(t)
+            for k in range(len(cut_steps)-1) :
+                lines[layers*p+k].set_data(data[cut_steps[k]:cut_steps[k+1],p,0], data[cut_steps[k]:cut_steps[k+1],p,1])
         return lines
 
     ani = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=200)
