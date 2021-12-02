@@ -108,12 +108,12 @@ default values :
     noise = 0.1
     speed = 0.03
     n_step = 30"""
-    N = 100
-    L = 25
+    N = 40
+    L = 5
     noise = 0.1
     speed = 0.03
 
-    n_step = 90
+    n_step = 400
 
     syst = ParticleSystem(N, L, noise, speed) # reminder : numberParticles, boxSize, noise, speed
     syst.initialise() # initialize a random configuration
