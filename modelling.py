@@ -36,21 +36,15 @@ periodic boundary conditions are used"""
         n_neighbors = len(neighbors)
         if n_neighbors==0 : ngb=False
         if n_neighbors > 0 :
-            """averarge of theta"""
-            for neighbor in neighbors :
-                avTheta += neighbor.theta
-            avTheta = avTheta / n_neighbors
-
-            """cotan (average sin / average cos )"""
             avCos = 0
             avSin = 0
             for neighbor in neighbors :
                 avCos += np.cos(neighbor.theta)
                 avSin += np.sin(neighbor.theta)
             # avCos & avSin are not normalised because we use only their ratio
-            altAvTheta = math.atan(avSin/avCos)
+            avTheta = math.atan(avSin/avCos)
 
-            self.theta = altAvTheta + random.uniform(-self.noise/2,self.noise/2)
+            self.theta = avTheta + random.uniform(-self.noise/2,self.noise/2)
             self.theta = self.theta%(2*math.pi)
         return ngb
 
