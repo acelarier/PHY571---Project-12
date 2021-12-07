@@ -93,7 +93,7 @@ save the results in the specified path"""
         print('Current directory : ' + current)
         basePath = str(input('\nEnter path + base filename : '))
 
-    metas = np.array([[400, 10, 5*(i+1)/10, 0.03, 1000] for i in range(10)])
+    metas = np.array([[40, 3.1, 5*(i+1)/10, 0.03, 1000] for i in range(30)])
     bench = TestBench(metas, basePath, fast, farRange)
 
     bench.run(verbSim=True)
@@ -113,7 +113,8 @@ default values :
     noise = 0.1
     speed = 0.03
 
-    n_step = 400
+    n_step = 500
+
 
     syst = ParticleSystem(N, L, noise, speed) # reminder : numberParticles, boxSize, noise, speed
     syst.initialise() # initialize a random configuration
