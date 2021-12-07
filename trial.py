@@ -112,9 +112,6 @@ save the results in the specified path"""
     bench = TestBench(metas, basePath, fast, farRange)
 
     bench.run(verbSim=True)
-    return
-
-
 
 
 
