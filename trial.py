@@ -62,7 +62,6 @@ Runs as followed :
 
             if self.fast :
                 self.syst = FastParticleSystem(N, L, noise, speed, farRange=self.farRange)
-                print('fast')
             else : self.syst = ParticleSystem(N, L, noise, speed)
             self.syst.initialise() # eventually add an input possibility for this function to always start with the same distribution...
 
@@ -93,7 +92,7 @@ save the results in the specified path"""
         print('Current directory : ' + current)
         basePath = str(input('\nEnter path + base filename : '))
 
-    metas = np.array([[40, 3.1, 5*(i+1)/10, 0.03, 1000] for i in range(30)])
+    metas = np.array([[40, 3.1, 5*(i+1)/30, 0.03, 1000] for i in range(30)])
     bench = TestBench(metas, basePath, fast, farRange)
 
     bench.run(verbSim=True)
@@ -116,11 +115,14 @@ save the results in the specified path"""
 
 
 
-def oneShotTestBench(N, L, noise, speed, n_step, res=False, _farRange=10, noShow=False) :
+def oneShotTestBench(N, L, noise, speed, n_step, fast=False, res=False, _farRange=10, noShow=False) :
     """execute a single simulation specified by N, L, noise, speed, n_step"""
     farRange = _farRange
 
-    syst = FastParticleSystem(N, L, noise, speed, farRange) # reminder : numberParticles, boxSize, noise, speed
+    if fast :
+        syst = ParticleSystem(N, L, noise, speed)
+    else :
+        syst = FastParticleSystem(N, L, noise, speed, farRange)
     syst.initialise() # initialize a random configuration
     data, meta = syst.simulate(n_step, verbose=True)
     va = averageVelocity(data, meta, cut = 100)[0]

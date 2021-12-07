@@ -24,29 +24,31 @@ class Particle:
         self.pos = position
         self.speed = speed
         self.theta = theta
+        self.avTheta = 0
         self.noise = noise
         self.L = L
         return
 
-    def updateOrientation(self, neighbors):
+
+    def updateAvTheta(self, neighbors) :
         """calculus of the average direction of the velocities of particles being within a circle of radius r surrounding the given particle (neighbors)
 periodic boundary conditions are used"""
-        avTheta = 0
-        ngb=True
-        n_neighbors = len(neighbors)
-        if n_neighbors==0 : ngb=False
-        if n_neighbors > 0 :
+        ngb = len(neighbors)>0
+        if ngb :
             avCos = 0
             avSin = 0
             for neighbor in neighbors :
                 avCos += np.cos(neighbor.theta)
                 avSin += np.sin(neighbor.theta)
             # avCos & avSin are not normalised because we use only their ratio
-            avTheta = math.atan(avSin/avCos)
-
-            self.theta = avTheta + random.uniform(-self.noise/2,self.noise/2)
-            self.theta = self.theta%(2*math.pi)
+            self.avTheta = math.atan(avSin/avCos)
         return ngb
+
+    def updateOrientation(self):
+        """the thetas are updated AFTER all particle have calculated the 'avTheta'"""
+        self.theta = self.avTheta + random.uniform(-self.noise/2,self.noise/2)
+        self.theta = self.theta%(2*math.pi)
+        return
 
 
     def updatePosition(self):
@@ -110,8 +112,9 @@ can be massively improved"""
         """engine executing an elementary step"""
         for i in range(self.N):
             neighbors = self.getNeighbors(self.particles[i])
-            self.particles[i].updateOrientation(neighbors)
+            self.particles[i].updateAvTheta(neighbors)
         for i in range(self.N):
+            self.particles[i].updateOrientation()
             self.particles[i].updatePosition()
         return
 
@@ -217,9 +220,10 @@ this method can make the function up to x10 faster"""
         problem=False
         for i in range(self.N):
             neighbors = self.getNeighbors(self.particles[i])
-            ok = self.particles[i].updateOrientation(neighbors)
+            ok = self.particles[i].updateAvTheta(neighbors)
             if not ok : print('no neighbors while countdown = %d'%(self.countdown))
         for i in range(self.N):
+            self.particles[i].updateOrientation()
             self.particles[i].updatePosition()
         if self.countdown == 0 :
             self.countdown = self.farRange
