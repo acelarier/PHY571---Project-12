@@ -12,7 +12,8 @@ import time
 
 
 
-
+# to do : traduire la table des matières dans overleaf
+#         il faut que update il faut mettre à jour les theta APRÈS avoir calculé les nouveaux theta pour tout le monde
 
 
 
