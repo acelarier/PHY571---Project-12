@@ -42,6 +42,8 @@ periodic boundary conditions are used"""
                 avSin += np.sin(neighbor.theta)
             # avCos & avSin are not normalised because we use only their ratio
             self.avTheta = math.atan(avSin/avCos)
+            if avCos<0 :
+                self.avTheta += np.pi
         return ngb
 
     def updateOrientation(self):
@@ -89,8 +91,7 @@ The box has periodic boundary counditions.
             self.particles.append(Particle(np.array([random.uniform(0,self.L), random.uniform(0,self.L)]), self.speed, random.uniform(0,2*np.pi), self.noise, self.L))
         return
 
-    def periodicDist(self, pos1, pos2) :
-        de
+
 
 
     def getNeighbors(self, particle):
@@ -139,13 +140,13 @@ example :
 
         data = np.zeros((n_step, self.N, 3))
 
-        for p in range(1,self.N) :
-            data[0,0,0:2] = self.particles[p].pos
-            data[0,0,2] = self.particles[p].theta
+        for p in range(0,self.N) :
+            data[0,p,0:2] = self.particles[p].pos
+            data[0,p,2] = self.particles[p].theta
         for t in range(1,n_step) :
             if verbose : print('Step : %d/%d'%(t,n_step))
             self.doStep()
-            for p in range(1,self.N) :
+            for p in range(0,self.N) :
                 data[t,p,0:2] = self.particles[p].pos
                 data[t,p,2] = self.particles[p].theta
 
@@ -350,6 +351,8 @@ class ParticleInField:
             self.sintheta = self.sintheta / sommeAires
         if self.costheta == 0 :
             self.theta = np.pi/2
+        elif self.costheta<0 :
+            self.theta = math.atan(self.sintheta / self.costheta) + np.pi
         else :
             self.theta = math.atan(self.sintheta / self.costheta)
         #ad of the noise on theta
@@ -474,9 +477,9 @@ A class that compute a simulation of particules interacting with their neighboor
            runs a simulation of n_step and return a numpy array formatted as above"""
         data = np.zeros((n_step, self.N, 3))
 
-        for p in range(1,self.N) :
-            data[0,0,0:2] = self.particles[p].pos
-            data[0,0,2] = self.particles[p].theta
+        for p in range(0,self.N) :
+            data[0,p,0:2] = self.particles[p].pos
+            data[0,p,2] = self.particles[p].theta
         for t in range(1,n_step) :
             self.doStep()
             for p in range(1,self.N) :

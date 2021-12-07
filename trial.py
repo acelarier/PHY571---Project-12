@@ -93,6 +93,9 @@ save the results in the specified path"""
         basePath = str(input('\nEnter path + base filename : '))
 
     metas = np.array([[40, 3.1, 5*(i+1)/30, 0.03, 1000] for i in range(30)])
+    #metas = np.array([[300, 25, 0.1, 0.03, 1000],
+    #                 [300, 7,  2,   0.03, 1000],
+    #                 [300, 5,  0.1, 0.03, 1000]])
     bench = TestBench(metas, basePath, fast, farRange)
 
     bench.run(verbSim=True)
@@ -120,9 +123,9 @@ def oneShotTestBench(N, L, noise, speed, n_step, fast=False, res=False, _farRang
     farRange = _farRange
 
     if fast :
-        syst = ParticleSystem(N, L, noise, speed)
-    else :
         syst = FastParticleSystem(N, L, noise, speed, farRange)
+    else :
+        syst = ParticleSystemWithField(N, L, noise, speed)
     syst.initialise() # initialize a random configuration
     data, meta = syst.simulate(n_step, verbose=True)
     va = averageVelocity(data, meta, cut = 100)[0]
