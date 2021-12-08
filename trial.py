@@ -15,10 +15,11 @@ import time
 class TestBench:
     """class able to run multiple simulations successively"""
 
-    def __init__(self, metadatas , basePath, fast=False, farRange=30) :
+    def __init__(self, metadatas , basePath, fast=False, farRange=30, field=False) :
         self.mds = metadatas
         self.basePath = basePath
         self.fast = fast
+        self.field = field
         self.farRange = farRange
 
         self.total_runs = len(metadatas)
@@ -60,7 +61,9 @@ Runs as followed :
             speed = self.mds[i,3]
             n_step = int(self.mds[i,4])
 
-            if self.fast :
+            if self.field :
+                self.syst = ParticleSystemWithField(N, L, noise, speed)
+            elif self.fast :
                 self.syst = FastParticleSystem(N, L, noise, speed, farRange=self.farRange)
             else : self.syst = ParticleSystem(N, L, noise, speed)
             self.syst.initialise() # eventually add an input possibility for this function to always start with the same distribution...
@@ -80,11 +83,11 @@ Runs as followed :
 
 
 
-
+tmp = [[400, 10, 4, 0.03, 1000] for i in range(1)] + [[400, 10, 5*(i+1)/30, 0.03, 1000] for i in range(0)]
 
 ## executable code
 
-def noiseTestBench(basePath=None, fast=False, farRange=20) :
+def noiseTestBench(basePath=None, fast=False, farRange=30, field=False) :
     """execute the simulations specified in the built-in variable 'testNoise'
 save the results in the specified path"""
     if basePath == None :
@@ -92,11 +95,14 @@ save the results in the specified path"""
         print('Current directory : ' + current)
         basePath = str(input('\nEnter path + base filename : '))
 
-    metas = np.array([[40, 3.1, 5*(i+1)/30, 0.03, 1000] for i in range(30)])
-    #metas = np.array([[300, 25, 0.1, 0.03, 1000],
-    #                 [300, 7,  2,   0.03, 1000],
-    #                 [300, 5,  0.1, 0.03, 1000]])
-    bench = TestBench(metas, basePath, fast, farRange)
+    global tmp
+
+    #metas = np.array(tmp)
+    #metas = np.array([[40, 3.1, 5*(i+1)/30, 0.03, 1000] for i in range(30)])
+    metas = np.array([[300, 25, 0.1, 0.03, 1000],
+                      [300, 7,  2,   0.03, 1000],
+                      [300, 5,  0.1, 0.03, 1000]])
+    bench = TestBench(metas, basePath, fast, farRange, field)
 
     bench.run(verbSim=True)
     return

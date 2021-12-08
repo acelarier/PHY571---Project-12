@@ -87,9 +87,8 @@ def displayLines(data, meta) :
     colors = ['r', 'b', 'g']
 
     plt.close('all')
-    plt.figure(figsize = (5,5))
-    fig, ax = plt.subplots()
-    plt.grid(ls='--', lw=0.5)
+    fig, ax = plt.subplots(figsize = (5,5))
+    #plt.grid(ls='--', lw=0.5)
     lines = [ax.plot(data[0,pp//layers,0], data[0,pp//layers,1], linewidth = 0.5, color='b')[0] for pp in range(layers*n_part)] #here we plot x3 each line (one 'on top' of the other). If a line crosses a barrier, we use one for each side
     L = meta[1]
     ax.set_xlim(0,L)

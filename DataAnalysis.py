@@ -247,8 +247,71 @@ indicate a directory containing the result of a testBench run in the variable 'b
     plt.ylim(0,1)
     plt.grid(ls='--', lw=0.5)
     plt.title('Time evolution of v_a')
+    #plt.legend()
+    plt.show()
+    return
+
+
+def velocityVsAny(basePath=None) :
+    """reads a set of files to plot the average speed as a function of the noise
+the files must have the format defined in testBench.run"""
+    if basePath == None :
+        current = os.getcwd()
+        print('Current directory : ' + current)
+        basePath = str(input('\nEnter path + base pathname : '))
+
+    #basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/100p_long_run'
+    #basePath = '/Users/antoine/Documents/X/3A/PHY571/project/PHY571---Project-12/experimental results/sim [01] fig2/100 particles/long_run/100p_long_run'
+
+    noises = []
+    vas = []
+    vars = []
+
+    exit = False
+    i = 0
+    while not exit :
+        testPath = basePath + '_sim' + str(i)
+        try :
+            data, meta = importData(testPath)
+        except :
+            exit = True
+        else :
+            # each ParticleSystem is processed inloop to keep the cached memory light
+            va, var = averageVelocity(data, meta)
+            noises.append(meta[2])
+            vas.append(va)
+            vars.append(var)
+            i += 1
+    if i==0 :
+        print('[ERROR] Failed to load files')
+        return
+
+    index = np.array([j+1 for j in range(i)])
+    vas = np.array(vas)
+    vars = np.array(vars)
+    N = str(int(meta[0]))
+    L = "{:.2f}".format(meta[1])
+
+    Mean = np.mean(vas)
+    Var = np.var(vas)
+    print('mean = %f\nvar = %f'%(Mean,Var))
+    Means = np.array([Mean for j in range(i)])
+    Vars = np.array([Var for j in range(i)])
+
+    plt.close('all')
+    plt.figure(figsize=(5,5))
+
+
+    thisLabel = 'N = '+N+', L = '+L # crapy assignment...
+    plt.plot(index, vas, label = thisLabel)
+    plt.plot(index, Means, label = 'mean', ls='--')
+
+    plt.xlabel('trial #')
+    plt.ylabel('average velocity')
+    plt.title('Calculating v_a as in Viscek 1995, fig2')
     plt.legend()
     plt.show()
+
     return
 
 
