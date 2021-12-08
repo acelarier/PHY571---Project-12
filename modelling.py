@@ -121,11 +121,9 @@ can be massively improved"""
 
     def simulate(self, n_step, verbose=False) :
         """runs a simulation of n_step and return a numpy array formatted as above
-
 return :
     'data' --> np.array containing the data, shaped as (n_step, n_part, 3) for [time, particule ID, coordinates]
     'meta' --> np.array containing metadata, shaped as (5,)                for [N, L, noise, speed, n_step]
-
 example :
                        x0     y0     theta0  x1     y1     theta1
     data = np.array([[[1.393, 0.383, 0.000], [1.393, 0.383, 0.000]],       step 0
@@ -275,6 +273,9 @@ class ParticleInField:
     def updateOrientation(self, nodes):
     #calculus of the average direction of the velocities of particles being within a circle of radius r surrounding the given particle (neighbors).
         sommeAires = 0
+        sumPonderationNodes = 0
+        self.costheta = 0
+        self.sintheta = 0
         #where is the particle ?
         i = int(self.pos[0])
         j = int(self.pos[1])
@@ -285,14 +286,11 @@ class ParticleInField:
         #noeud i,j
         aire = (self.pos[0] - i)*(self.pos[1] - j)
         sommeAires += aire
-        if nodes[i*self.L + j].SumPonderation == 0 :
-            self.costheta= 0
-        else :
-            self.costheta = nodes[i*self.L + j].SumCos / nodes[i*self.L + j].SumPonderation * (1 - aire)
-        if nodes[i*self.L + j].SumPonderation == 0 :
-            self.sintheta = 0
-        else :
-            self.sintheta = nodes[i*self.L + j].SumSin / nodes[i*self.L + j].SumPonderation * (1 - aire)
+        if nodes[i*self.L + j].SumPonderation != 0 :
+            self.costheta += nodes[i*self.L + j].SumCos * (1 - aire)
+        if nodes[i*self.L + j].SumPonderation != 0 :
+            self.sintheta += nodes[i*self.L + j].SumSin * (1 - aire)
+        sumPonderationNodes += nodes[i*self.L + j].SumPonderation
         #noeud i+1,j
         if int(self.pos[0])+1==self.L :
             i = 0
@@ -301,14 +299,11 @@ class ParticleInField:
         j = int(self.pos[1])
         aire = (i - self.pos[0])*(self.pos[1] - j)
         sommeAires += aire
-        if nodes[i*self.L + j].SumPonderation==0 :
-            self.costheta = 0
-        else :
-            self.costheta = nodes[i*self.L + j].SumCos / nodes[i*self.L + j].SumPonderation * (1 - aire)
-        if nodes[i*self.L + j].SumPonderation==0 :
-            self.sintheta = 0
-        else :
-            self.sintheta = nodes[i*self.L + j].SumSin / nodes[i*self.L + j].SumPonderation * (1 - aire)
+        if nodes[i*self.L + j].SumPonderation !=0 :
+            self.costheta += nodes[i*self.L + j].SumCos * (1 - aire)
+        if nodes[i*self.L + j].SumPonderation !=0 :
+            self.sintheta += nodes[i*self.L + j].SumSin * (1 - aire)
+        sumPonderationNodes += nodes[i*self.L + j].SumPonderation
         #noeud i,j+1
         i = int(self.pos[0])
         if int(self.pos[1])+1==self.L :
@@ -317,14 +312,11 @@ class ParticleInField:
             j = int(self.pos[1]) + 1
         aire = (self.pos[0] - i)*(j - self.pos[1])
         sommeAires += aire
-        if nodes[i*self.L + j].SumPonderation==0:
-            self.costheta = 0
-        else :
-            self.costheta = nodes[i*self.L + j].SumCos / nodes[i*self.L + j].SumPonderation * (1 - aire)
-        if nodes[i*self.L + j].SumPonderation==0:
-            self.sintheta = 0
-        else :
-            self.sintheta = nodes[i*self.L + j].SumSin / nodes[i*self.L + j].SumPonderation * (1 - aire)
+        if nodes[i*self.L + j].SumPonderation !=0 :
+            self.costheta += nodes[i*self.L + j].SumCos * (1 - aire)
+        if nodes[i*self.L + j].SumPonderation !=0:
+            self.sintheta += nodes[i*self.L + j].SumSin * (1 - aire)
+        sumPonderationNodes += nodes[i*self.L + j].SumPonderation
         #noeud i+1,j+1
         if int(self.pos[0])+1==self.L :
             i = 0
@@ -336,19 +328,19 @@ class ParticleInField:
             j = int(self.pos[1]) + 1
         aire = (i - self.pos[0])*(j - self.pos[1])
         sommeAires += aire
-        if nodes[i*self.L + j].SumPonderation==0 :
-            self.costheta = 0
-        else :
-            self.costheta = nodes[i*self.L + j].SumCos / nodes[i*self.L + j].SumPonderation * (1 - aire)
-        if nodes[i*self.L + j].SumPonderation==0 :
-            self.sintheta = 0
-        else :
-            self.sintheta = nodes[i*self.L + j].SumSin / nodes[i*self.L + j].SumPonderation * (1 - aire)
+        if nodes[i*self.L + j].SumPonderation !=0 :
+            self.costheta += nodes[i*self.L + j].SumCos * (1 - aire)
+        if nodes[i*self.L + j].SumPonderation !=0 :
+            self.sintheta += nodes[i*self.L + j].SumSin * (1 - aire)
+        sumPonderationNodes += nodes[i*self.L + j].SumPonderation
         #renormalization
         #unuseful to normalize costheta and sintheta as we use the ratio to calculate theta and we then (after adding the random part of theta) update costheta and sintheta
         if sommeAires != 0 :
             self.costheta = self.costheta / sommeAires
             self.sintheta = self.sintheta / sommeAires
+        if sumPonderationNodes != 0 :
+            self.costheta = self.costheta / sumPonderationNodes
+            self.sintheta = self.sintheta / sumPonderationNodes
         if self.costheta == 0 :
             self.theta = np.pi/2
         elif self.costheta<0 :
@@ -412,8 +404,8 @@ A class that compute a simulation of particules interacting with their neighboor
                 self.nodes[i*self.L + j].SumSin = 0
                 self.nodes[i*self.L + j].SumPonderate = 0
         #calculate the nodes
-        for i in range(self.N) :
-            particle = self.particles[i]
+        for k in range(self.N) :
+            particle = self.particles[k]
             #where is the particle ? at the frontier between two cases, the particle is in the right/upper box. Attention to the limit periodic conditions
             i = int(particle.pos[0])
             j = int(particle.pos[1])
@@ -423,9 +415,9 @@ A class that compute a simulation of particules interacting with their neighboor
                 j=0
             #node i,j
             aire = (particle.pos[0] - i)*(particle.pos[1] - j)
-            self.nodes[i*self.L + j].SumCos = particle.costheta * (1 - aire)
-            self.nodes[i*self.L + j].SumSin = particle.sintheta * (1 - aire)
-            self.nodes[i*self.L + j].SumPonderation = (1 - aire)
+            self.nodes[i*self.L + j].SumCos += particle.costheta * (1 - aire)
+            self.nodes[i*self.L + j].SumSin += particle.sintheta * (1 - aire)
+            self.nodes[i*self.L + j].SumPonderation += (1 - aire)
             #node i+1,j
             if int(particle.pos[0])+1==self.L :
                 i = 0
@@ -433,9 +425,9 @@ A class that compute a simulation of particules interacting with their neighboor
                 i = int(particle.pos[0]) + 1
             j = int(particle.pos[1])
             aire = (i - particle.pos[0])*(particle.pos[1] - j)
-            self.nodes[i*self.L + j].SumCos = particle.costheta * (1 - aire)
-            self.nodes[i*self.L + j].SumSin = particle.sintheta * (1 - aire)
-            self.nodes[i*self.L + j].SumPonderation = (1 - aire)
+            self.nodes[i*self.L + j].SumCos += particle.costheta * (1 - aire)
+            self.nodes[i*self.L + j].SumSin += particle.sintheta * (1 - aire)
+            self.nodes[i*self.L + j].SumPonderation += (1 - aire)
             #node i,j+1
             i = int(particle.pos[0])
             if int(particle.pos[1])+1==self.L :
@@ -443,9 +435,9 @@ A class that compute a simulation of particules interacting with their neighboor
             else :
                 j = int(particle.pos[1]) + 1
             aire = (particle.pos[0] - i)*(j - particle.pos[1])
-            self.nodes[i*self.L + j].SumCos = particle.costheta * (1 - aire)
-            self.nodes[i*self.L + j].SumSin = particle.sintheta * (1 - aire)
-            self.nodes[i*self.L + j].SumPonderation = (1 - aire)
+            self.nodes[i*self.L + j].SumCos += particle.costheta * (1 - aire)
+            self.nodes[i*self.L + j].SumSin += particle.sintheta * (1 - aire)
+            self.nodes[i*self.L + j].SumPonderation += (1 - aire)
             #node i+1,j+1
             if int(particle.pos[0])+1==self.L :
                 i = 0
@@ -456,9 +448,9 @@ A class that compute a simulation of particules interacting with their neighboor
             else :
                 j = int(particle.pos[1]) + 1
             aire = (i - particle.pos[0])*(j - particle.pos[1])
-            self.nodes[i*self.L + j].SumCos = particle.costheta * (1 - aire)
-            self.nodes[i*self.L + j].SumSin = particle.sintheta * (1 - aire)
-            self.nodes[i*self.L + j].SumPonderation = (1 - aire)
+            self.nodes[i*self.L + j].SumCos += particle.costheta * (1 - aire)
+            self.nodes[i*self.L + j].SumSin += particle.sintheta * (1 - aire)
+            self.nodes[i*self.L + j].SumPonderation += (1 - aire)
 
 
 
