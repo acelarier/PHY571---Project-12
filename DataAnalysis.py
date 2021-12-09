@@ -239,7 +239,8 @@ indicate a directory containing the result of a testBench run in the variable 'b
     plt.figure(figsize=(5,5))
 
     for i in range(len(noises)) :
-        thisLabel = 'N = '+N+', L = '+L+', noise = '+"{:.2f}".format(noises[i]) # crapy assignment...
+        #thisLabel = 'N = '+N+', L = '+L+', noise = '+"{:.2f}".format(noises[i]) # crapy assignment...
+        thisLabel = 'noise = '+"{:.2f}".format(noises[i]) # crapy assignment...
         plt.plot(np.arange(len(vaSeries[i])), vaSeries[i], label = thisLabel)
 
     plt.xlabel('step')
@@ -247,7 +248,7 @@ indicate a directory containing the result of a testBench run in the variable 'b
     plt.ylim(0,1)
     plt.grid(ls='--', lw=0.5)
     plt.title('Time evolution of v_a')
-    #plt.legend()
+    plt.legend()
     plt.show()
     return
 
@@ -315,3 +316,34 @@ the files must have the format defined in testBench.run"""
     return
 
 
+
+
+def runtimeVSsyst(basePath=None) :
+    """reads and displays a runtime trial"""
+
+    if basePath == None :
+        current = os.getcwd()
+        print('Current directory : ' + current)
+        basePath = str(input('\nEnter path + base pathname : '))
+
+    runtimes = np.load(basePath + '_runtimes.npy')
+    Ns = np.load(basePath + '_Ns.npy')
+    syst = ['naïve', 'close neighbourhood', 'Particle In Cell']
+
+    print('\nLoaded from :\n    ' + basePath.rsplit(sep='/')[-1] + '_runtimes.npy\n    ' + basePath.rsplit(sep='/')[-1] + '_Ns.npy' )
+
+    plt.close('all')
+    plt.figure(figsize=(5,5))
+
+    plt.plot(Ns, runtimes[0], label = syst[0])
+    plt.plot(Ns, runtimes[1], label = syst[1])
+    plt.plot(Ns, runtimes[2], label = syst[2])
+
+    plt.xlabel('population')
+    plt.ylabel('runtime (s)')
+    plt.grid(ls='--', lw=0.5)
+    plt.title('Runtime')
+    plt.legend()
+    plt.show()
+
+    return

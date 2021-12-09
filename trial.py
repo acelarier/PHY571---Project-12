@@ -82,12 +82,11 @@ Runs as followed :
 
 
 
-
 tmp = [[400, 10, 4, 0.03, 1000] for i in range(1)] + [[400, 10, 5*(i+1)/30, 0.03, 1000] for i in range(0)]
 
 ## executable code
 
-def noiseTestBench(basePath=None, fast=False, farRange=30, field=False) :
+def noiseTestBench(basePath=None, fast=False, farRange=25, field=False) :
     """execute the simulations specified in the built-in variable 'testNoise'
 save the results in the specified path"""
     if basePath == None :
@@ -98,10 +97,11 @@ save the results in the specified path"""
     global tmp
 
     #metas = np.array(tmp)
-    #metas = np.array([[40, 3.1, 5*(i+1)/30, 0.03, 1000] for i in range(30)])
-    metas = np.array([[300, 25, 0.1, 0.03, 1000],
-                      [300, 7,  2,   0.03, 1000],
-                      [300, 5,  0.1, 0.03, 1000]])
+    metas = np.array([[100, 5, 5*(i+1)/30, 0.03, 1000] for i in range(30)])
+    #metas = np.array([[100, 5, 4, 0.03, 1000] for i in range(30)])
+    #metas = np.array([[300, 25, 0.1, 0.03, 1000],
+    #                  [300, 7,  2,   0.03, 1000],
+    #                  [300, 5,  0.1, 0.03, 1000]])
     bench = TestBench(metas, basePath, fast, farRange, field)
 
     bench.run(verbSim=True)
@@ -124,20 +124,61 @@ save the results in the specified path"""
 
 
 
-def oneShotTestBench(N, L, noise, speed, n_step, fast=False, res=False, _farRange=10, noShow=False) :
+def oneShotTestBench(N, L, noise, speed, n_step, fast=False, field=False, res=False, _farRange=30, noShow=False) :
     """execute a single simulation specified by N, L, noise, speed, n_step"""
     farRange = _farRange
 
-    if fast :
+    if field :
+        syst = ParticleSystemWithField(N, L, noise, speed)
+    elif fast :
         syst = FastParticleSystem(N, L, noise, speed, farRange)
     else :
-        syst = ParticleSystemWithField(N, L, noise, speed)
+        syst = ParticleSystem(N, L, noise, speed)
     syst.initialise() # initialize a random configuration
-    data, meta = syst.simulate(n_step, verbose=True)
+    data, meta, runtime = syst.simulate(n_step, verbose=True)
     va = averageVelocity(data, meta, cut = 100)[0]
     print('Average velocity : %f'%(va))
     if not noShow : displayLines(data, meta)
     if res : return data, meta
-    return va
+    return va, runtime
 
+
+
+
+
+def runtimeTestBench(basePath=None) :
+    """exucute a series of runs for different values of N and different calculus methods (PIC, fast or naive)"""
+
+    if basePath == None :
+        current = os.getcwd()
+        print('Current directory : ' + current)
+        basePath = str(input('\nEnter path + base pathname : '))
+
+    runtimes = [[],[],[]]
+
+    Ns = [int(40*((100/40)**(1/2))**(i-3)) for i in range(8)]
+
+    # naïve
+    for N in Ns :
+        rt = oneShotTestBench(N, 5, 2, 0.03, 100, noShow=True)[1]
+        runtimes[0].append(rt)
+    # close neighbourhood
+    for N in Ns :
+        rt = oneShotTestBench(N, 5, 2, 0.03, 100, fast=True, noShow=True)[1]
+        runtimes[1].append(rt)
+    # PIC
+    for N in Ns :
+        rt = oneShotTestBench(N, 5, 2, 0.03, 100, field=True, noShow=True)[1]
+        runtimes[2].append(rt)
+
+
+    runtimes=np.array(runtimes)
+    Ns = np.array(Ns)
+
+    np.save(basePath + '_runtimes', runtimes)
+    np.save(basePath + '_Ns', Ns)
+
+    print('\nSimulation results saved as :\n    ' + basePath.rsplit(sep='/')[-1] + '_runtimes.npy\n    ' + basePath.rsplit(sep='/')[-1] + '_Ns.npy' )
+
+    return
 

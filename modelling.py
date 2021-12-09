@@ -83,6 +83,7 @@ The box has periodic boundary counditions.
         self.noise = noise
         self.speed = speed
         self.particles = list()
+        self.name = 'base'
         return
 
     def initialise(self) :
@@ -133,7 +134,7 @@ example :
                      [[1.393, 1.183, 0.000], [1.393, 0.383, 1.200]]]       step 4"""
 
         if verbose :
-            print('ParticleSystem start running...')
+            print('ParticleSystem start running... ('+self.name+')')
             start_time = time.time()
 
         data = np.zeros((n_step, self.N, 3))
@@ -156,6 +157,7 @@ example :
             runtime = stop_time - start_time
             print('Runtime : %f s'%(runtime))
             print('End of simulation')
+            return data, meta, runtime
 
         return data, meta
 
@@ -179,6 +181,7 @@ class FastParticleSystem(ParticleSystem):
         else :
             self.farRange = farRange
         self.countdown = 0
+        self.name = 'fast'
         return
 
     def initialise(self) :
@@ -384,6 +387,7 @@ A class that compute a simulation of particules interacting with their neighboor
         self.speed = speed
         self.particles = list()
         self.nodes = list()
+        self.name = 'field'
 
 
     def initialise(self) :
@@ -467,18 +471,35 @@ A class that compute a simulation of particules interacting with their neighboor
         """data format : np.array, shape = (n_step, n_part, 3) --> [time, particule ID, coordinates]
                          + an array containing meta data : [N, L, noise, speed, n_step]
            runs a simulation of n_step and return a numpy array formatted as above"""
+
+
+        if verbose :
+            print('ParticleSystem start running... ('+self.name+')')
+            start_time = time.time()
+
+
+
         data = np.zeros((n_step, self.N, 3))
 
         for p in range(0,self.N) :
             data[0,p,0:2] = self.particles[p].pos
             data[0,p,2] = self.particles[p].theta
         for t in range(1,n_step) :
+            if verbose : print('Step : %d/%d'%(t,n_step))
             self.doStep()
             for p in range(1,self.N) :
                 data[t,p,0:2] = self.particles[p].pos
                 data[t,p,2] = self.particles[p].theta
 
         meta = np.array([self.N, self.L, self.noise, self.speed, n_step])
+
+
+        if verbose :
+            stop_time = time.time()
+            runtime = stop_time - start_time
+            print('Runtime : %f s'%(runtime))
+            print('End of simulation')
+            return data, meta, runtime
 
         return data, meta
 
