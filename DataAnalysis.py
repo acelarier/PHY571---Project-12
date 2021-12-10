@@ -129,6 +129,9 @@ the files must have the format defined in testBench.run"""
     plt.ylabel('average velocity')
     plt.title('Calculating v_a as in Viscek 1995, fig2')
     plt.legend()
+
+    plt.savefig(basePath)
+
     plt.show()
 
     return
@@ -196,6 +199,9 @@ the files must have the format defined in testBench.run"""
     plt.ylabel('average velocity')
     plt.title('Showing the difference with a relaxed situation')
     plt.legend(title=thisLabel)
+
+    plt.savefig(basePath)
+
     plt.show()
     return
 
@@ -249,6 +255,10 @@ indicate a directory containing the result of a testBench run in the variable 'b
     plt.grid(ls='--', lw=0.5)
     plt.title('Time evolution of v_a')
     plt.legend()
+
+
+    plt.savefig(basePath)
+
     plt.show()
     return
 
@@ -311,6 +321,10 @@ the files must have the format defined in testBench.run"""
     plt.ylabel('average velocity')
     plt.title('Calculating v_a as in Viscek 1995, fig2')
     plt.legend()
+
+
+    plt.savefig(basePath)
+
     plt.show()
 
     return
@@ -344,6 +358,9 @@ def runtimeVSsyst(basePath=None) :
     plt.grid(ls='--', lw=0.5)
     plt.title('Runtime')
     plt.legend()
+
+    plt.savefig(basePath)
+
     plt.show()
 
     return
