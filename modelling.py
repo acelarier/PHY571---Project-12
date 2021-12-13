@@ -157,7 +157,7 @@ example :
             runtime = stop_time - start_time
             print('Runtime : %f s'%(runtime))
             print('End of simulation')
-            return data, meta, runtime
+            return data, meta #, runtime
 
         return data, meta
 
@@ -280,7 +280,7 @@ class ParticleInField:
         self.costheta = 0
         self.sintheta = 0
         #where is the particle ?
-        i = int(self.pos[0])
+        i = int(self.pos[0]
         j = int(self.pos[1])
         if i==self.L :
             i=0
@@ -355,6 +355,7 @@ class ParticleInField:
         self.theta = self.theta%(2*math.pi)
         self.costheta = math.cos(self.theta)
         self.sintheta = math.sin(self.theta)
+        return
 
 
 
@@ -506,13 +507,36 @@ A class that compute a simulation of particules interacting with their neighboor
 
 
 
+class ParticleInFineField(ParticleInField) :
 
-
+    def __init__(self, position, speed, orientation, noise, boxSize, finess=4) :
+        ParticleInField.__init__(self, position, speed, orientation, noise, boxSize)
+        self.finess = finess
+        return
 
 
 ## executable code
 
 
+def buildCircleList(N) :
+    """N is the number of cell per unit of length
+returns the list of nodes to account in a circle"""
+    duets = []
+    for k in range(-N,N+1) :
+        for l in range(-N,N+1) :
+            if k**2+l**2 <= N**2 :
+                duets.append([k,l])
+    return duets
+
+
+
+def toDiscreteCoord(x,y,N,L) :
+    """returns the discrete coordinates (i,j) of a point (x,y) where :
+    - 0 <= i, j < N*L
+    - 0 <= x, y < L"""
+    i = int(x*N)
+    j = int(y*N)
+    return i, j
 
 
 

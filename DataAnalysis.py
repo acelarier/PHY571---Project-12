@@ -18,6 +18,55 @@ import os
 
 
 
+
+
+
+class Histogram:
+
+    def __init__(self, x_min, x_max, n_bins):
+        self.x_min, self.x_max = x_min, x_max
+        self.x_values, self.delta = np.linspace(x_min, x_max, n_bins, retstep=True)
+        self.y_values = np.zeros(len(self.x_values))
+        self.n_values = 0
+
+    def __lshift__(self, value):
+        ind = np.int((value-self.x_min)/self.delta)
+        if (ind >= 0) and (ind < len(self.x_values)):
+            self.y_values[np.int((value-self.x_min)/self.delta)] += 1
+            self.n_values += 1
+
+def histoTheta(data, meta, n_bins, accu) :
+    """returns the histograms (for each timestep) of thetas"""
+
+    N = int(meta[0])
+    n_step = int(meta[4])
+
+    counters = np.zeros((n_step, n_bins))
+    dtheta = 2*np.pi/n_bins
+
+    if not accu :
+        for t in range(n_step) :
+            for p in range(N) :
+                theta = data[t,p,2]
+                ind = np.int(theta/dtheta)
+                counters[t,ind] += 1/N
+    else :
+        for t in range(n_step) :
+            if t>0 :
+                counters[t,:] += counters[t-1,:]
+            avTheta = np.mean(data[t,:,2])
+            for p in range(N) :
+                delta = (data[t,p,2]-avTheta+np.pi)%(2*np.pi)
+                ind = int(delta/dtheta)
+                counters[t,ind] += 1
+        for t in range(n_step) :
+            counters[t,:] = counters[t,:]/((t+1)*N)
+
+    return counters
+
+
+
+
 def averageVelocity(data, meta, cut=0):
     """return the average velocity  (between 0 and 1) from the numpy vector data with the formula from ref [02]
 velocity is averaged on particules AND timesteps
@@ -70,6 +119,26 @@ also builds a sliding average for readability with optionnal parameter smooth
         slidingV_A[step] += av
     return V_A, slidingV_A
 
+
+
+def correlate(V_A) :
+    """builds the correlation function of the global speed"""
+    n_step = len(V_A)
+    avV_A = np.mean(V_A)
+
+    corr = []
+    vars = []
+
+    for tau in range(n_step-100) :
+        prod = V_A[:n_step-tau]*V_A[tau:] - avV_A**2 # version 1
+        #prod = (V_A[:n_step-tau]-avV_A)*(V_A[tau:]-avV_A) # version 2
+        corr.append(np.mean(prod))
+        vars.append(np.var(prod))
+
+    corr = np.array(corr)
+    vars = np.array(vars)
+
+    return corr, vars
 
 
 ## executable code
@@ -364,3 +433,64 @@ def runtimeVSsyst(basePath=None) :
     plt.show()
 
     return
+
+
+
+
+
+def timeCorrelation(basePath=None) :
+    """show the smoothed time evolution of v_a for a series of run
+indicate a directory containing the result of a testBench run in the variable 'basePath'"""
+
+    if basePath == None :
+        current = os.getcwd()
+        print('Current directory : ' + current)
+        basePath = str(input('\nEnter path + base pathname : '))
+    #basePath = '/Users/antoine/Documents/X/3A/PHY571/tmp/100p_long_run'
+
+    noises = []
+    corrSeries = []
+
+    exit = False
+    i = 0
+    while not exit :
+        testPath = basePath + '_sim' + str(i)
+        try :
+            data, meta = importData(testPath)
+        except :
+            exit = True
+        else :
+            # each ParticleSystem is processed inloop to keep the cached memory light
+            va = timeSeries(data, meta)[0]
+            corr, vars = correlate(va) #(...)[1] for smoothing !
+            noises.append(meta[2])
+            corrSeries.append(corr)
+        i += 1
+
+    N = str(int(meta[0]))
+    L = "{:.2f}".format(meta[1])
+
+
+    plt.close('all')
+    plt.figure(figsize=(5,5))
+
+    for i in range(len(corrSeries)) :
+        #thisLabel = 'N = '+N+', L = '+L+', noise = '+"{:.2f}".format(noises[i]) # crapy assignment...
+        thisLabel = 'noise = '+"{:.2f}".format(noises[i]) # crapy assignment...
+        plt.plot(np.arange(len(corrSeries[i])), corrSeries[i], label = thisLabel)
+
+    plt.xlabel('step')
+    plt.ylabel('correlation (unitless)')
+    #plt.ylim(-0.005,0.02)
+    plt.grid(ls='--', lw=0.5)
+    plt.title('Correlation functions')
+    plt.legend()
+
+
+    #plt.savefig(basePath)
+
+    plt.show()
+    return
+
+
+
