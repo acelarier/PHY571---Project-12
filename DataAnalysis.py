@@ -33,10 +33,11 @@ def histoTheta(data, meta, n_bins, accu) :
 
     if not accu :
         for t in range(n_step) :
+            avTheta = np.mean(data[t,:,2])
             for p in range(N) :
-                theta = data[t,p,2]
-                ind = np.int(theta/dtheta)
-                counters[t,ind] += 1/N
+                delta = (data[t,p,2]-avTheta+np.pi)%(2*np.pi)
+                ind = int(delta/dtheta)
+                counters[t,ind] += 1/(N*dtheta)
     else :
         for t in range(n_step) :
             if t>0 :
@@ -47,7 +48,9 @@ def histoTheta(data, meta, n_bins, accu) :
                 ind = int(delta/dtheta)
                 counters[t,ind] += 1
         for t in range(n_step) :
-            counters[t,:] = counters[t,:]/((t+1)*N)
+            counters[t,:] = counters[t,:]/((t+1)*N*dtheta)
+            if t==100 :
+                print(np.sum(counters[t,:])*dtheta)
 
     return counters
 
@@ -55,7 +58,7 @@ def histoTheta(data, meta, n_bins, accu) :
 
 
 
-def histoDist(data, meta, n_bins, accu) :
+def histoDist(data, meta, n_bins, accu, verbose) :
     """returns the histograms (for each timestep) of thetas"""
 
     N = int(meta[0])
@@ -63,11 +66,11 @@ def histoDist(data, meta, n_bins, accu) :
     L = meta[1]
 
     counters = np.zeros((n_step, n_bins))
-    #dr = L/(np.sqrt(2)*n_bins)
-    dr=L/n_bins
+    dr = L/(np.sqrt(2)*n_bins)
 
     if not accu :
         for t in range(n_step) :
+            if verbose : print('Step : %d/%d'%(t,n_step))
             for p in range(N) :
                 for q in range(p+1,N) :
                     delta = np.abs(data[t,p,0:2]-data[t,q,0:2])
@@ -79,21 +82,24 @@ def histoDist(data, meta, n_bins, accu) :
                         print(L)
                         print(t,data[t,p,0:2],data[t,q,0:2], dist, dist/dr, n_bins)
                     ind = int(dist/dr)
-                    counters[t,ind] += 2/(N*(N-1))
+                    counters[t,ind] += 2/(N*(N-1)*dr)
     else :
         for t in range(n_step) :
+            if verbose : print('Step : %d/%d'%(t,n_step))
             if t>0 :
                 counters[t,:] += counters[t-1,:]
             for p in range(N) :
                 for q in range(p+1,N) :
-                    delta = data[t,p,0:2]-data[t,q,0:2]
-                    delta[0] = min(delta[0], self.L-delta[0]) # taking into account the peridodic boundary condition...
-                    delta[1] = min(delta[1], self.L-delta[1]) # ...using the minimum
+                    delta = np.abs(data[t,p,0:2]-data[t,q,0:2])
+                    delta[0] = min(delta[0], L-delta[0]) # taking into account the peridodic boundary condition...
+                    delta[1] = min(delta[1], L-delta[1]) # ...using the minimum
                     dist = np.linalg.norm(delta)
                     ind = int(dist/dr)
                     counters[t,ind] += 1
         for t in range(n_step) :
-            counters[t,:] = 2*counters[t,:]/((t+1)*N*(N-1))
+            counters[t,:] = 2*counters[t,:]/((t+1)*N*(N-1)*dr)
+            if t==100 :
+                print(np.sum(counters[t,:])*dr)
 
     return counters
 
@@ -523,5 +529,134 @@ indicate a directory containing the result of a testBench run in the variable 'b
     plt.show()
     return
 
+
+
+
+
+def distLiveHisto(basePath=None, n_bins=20, accu=False, verbose=False) :
+
+
+    if basePath == None :
+        current = os.getcwd()
+        print('Current directory : ' + current)
+        path = str(input('\nEnter path + base pathname + _sim# : '))
+
+    data, meta = importData(path)
+
+    n_step, n_part = np.shape(data)[0:2]
+    speed = meta[3]
+    noise = meta[2]
+    layers = 3
+    trace = 20
+    L = meta[1]
+
+    counters = histoDist(data, meta, n_bins, accu, verbose)
+    dists = np.linspace(0, L/np.sqrt(2), n_bins)
+
+
+    thickness = [1.,0.5,0.3]
+    colors = ['r', 'b', 'g']
+
+    plt.close('all')
+    fig = plt.figure(figsize=(14,5))
+    ax = fig.add_subplot(121, aspect='equal')
+    #plt.grid(ls='--', lw=0.5)
+    lines = [ax.plot(data[0,pp//layers,0], data[0,pp//layers,1], linewidth = 0.5, color='b')[0] for pp in range(layers*n_part)] #here we plot x3 each line (one 'on top' of the other). If a line crosses a barrier, we use one for each side
+    ax.set_xlim(0,L)
+    ax.set_ylim(0,L)
+
+    ax = fig.add_subplot(122, aspect='auto')
+
+    thisLabel = 'noise = '+"{:.2f}".format(noise) +', N = %d'%(n_part)
+    histo = ax.plot(dists, counters[0,:], label = thisLabel)[0]
+    ax.set_xlim(0,L/(np.sqrt(2)))
+    ax.set_xlabel('distance')
+    ax.set_ylabel('density')
+    ax.set_ylim(0,1.3*np.max(counters))
+    ax.legend()
+
+
+    def frame(t):
+        start=max((t-trace,0))
+        for p in range(n_part) :
+            cut_steps = [start]
+            for i in range(start+1, t) :
+                if np.abs(data[i-1,p,0]-data[i,p,0]) > speed+0.1 or np.abs(data[i-1,p,1]-data[i,p,1]) > speed+0.1 :
+                    cut_steps.append(i)
+            for i in range(layers+1-len(cut_steps)) :
+                cut_steps.append(t)
+            for k in range(len(cut_steps)-1) :
+                lines[layers*p+k].set_data(data[cut_steps[k]:cut_steps[k+1],p,0], data[cut_steps[k]:cut_steps[k+1],p,1])
+
+        histo.set_data(dists,counters[t,:])
+        return lines, histo
+
+    ani = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=10)
+    plt.show()
+
+    return
+
+
+def thetaLiveHisto(basePath=None, n_bins=20, accu=False) :
+
+    if basePath == None :
+        current = os.getcwd()
+        print('Current directory : ' + current)
+        path = str(input('\nEnter path + base pathname + _sim# : '))
+
+    data, meta = importData(path)
+
+    counters = histoTheta(data, meta, n_bins, accu)
+    thetas = np.linspace(-np.pi, np.pi, n_bins)
+
+
+    n_step, n_part = np.shape(data)[0:2]
+    speed = meta[3]
+    noise = meta[2]
+
+    layers = 3
+    trace = 20
+    thickness = [1.,0.5,0.3]
+    colors = ['r', 'b', 'g']
+
+    plt.close('all')
+    fig = plt.figure(figsize=(14,5))
+    ax = fig.add_subplot(121, aspect='equal')
+    #plt.grid(ls='--', lw=0.5)
+    lines = [ax.plot(data[0,pp//layers,0], data[0,pp//layers,1], linewidth = 0.5, color='b')[0] for pp in range(layers*n_part)] #here we plot x3 each line (one 'on top' of the other). If a line crosses a barrier, we use one for each side
+    L = meta[1]
+    ax.set_xlim(0,L)
+    ax.set_ylim(0,L)
+
+    ax = fig.add_subplot(122, aspect='auto')
+
+    thisLabel = 'noise = '+"{:.2f}".format(noise) +', N = %d'%(n_part)
+    histo = ax.plot(thetas, counters[0,:], label=thisLabel)[0]
+    ax.set_xlim(-np.pi, np.pi)
+    ax.set_xlabel('\u03B8 - \u27E8\u03B8\u27e9 (rad)')
+    ax.set_ylim(0,1.3*np.max(counters))
+    ax.set_ylabel('density (/rad)')
+    ax.legend()
+
+
+    def frame(t):
+        start=max((t-trace,0))
+        for p in range(n_part) :
+            cut_steps = [start]
+            for i in range(start+1, t) :
+                if np.abs(data[i-1,p,0]-data[i,p,0]) > speed+0.1 or np.abs(data[i-1,p,1]-data[i,p,1]) > speed+0.1 :
+                    cut_steps.append(i)
+            for i in range(layers+1-len(cut_steps)) :
+                cut_steps.append(t)
+            for k in range(len(cut_steps)-1) :
+                lines[layers*p+k].set_data(data[cut_steps[k]:cut_steps[k+1],p,0], data[cut_steps[k]:cut_steps[k+1],p,1])
+
+        histo.set_data(thetas,counters[t,:])
+        return lines, histo
+
+    ani = animation.FuncAnimation(fig, frame, np.arange(1, n_step), interval=10)
+    plt.show()
+
+    return
 
 
