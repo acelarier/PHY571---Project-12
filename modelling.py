@@ -102,7 +102,7 @@ can be massively improved"""
         neighbors = []
         for i in range(self.N) :
             particle_i = self.particles[i]
-            delta = particle_i.pos - particle.pos
+            delta = np.abs(particle_i.pos - particle.pos) # grosse erreur ici (sans le np.abs)
             delta[0] = min(delta[0], self.L-delta[0]) # taking into account the peridodic boundary condition...
             delta[1] = min(delta[1], self.L-delta[1]) # ...using the minimum
             distance = np.linalg.norm(delta)
@@ -274,13 +274,13 @@ class ParticleInField:
 
 
     def updateOrientation(self, nodes):
-    #calculus of the average direction of the velocities of particles being within a circle of radius r surrounding the given particle (neighbors).
+        #calculus of the average direction of the velocities of particles being within a circle of radius r surrounding the given particle (neighbors).
         sommeAires = 0
         sumPonderationNodes = 0
         self.costheta = 0
         self.sintheta = 0
         #where is the particle ?
-        i = int(self.pos[0]
+        i = int(self.pos[0])
         j = int(self.pos[1])
         if i==self.L :
             i=0
@@ -505,14 +505,6 @@ A class that compute a simulation of particules interacting with their neighboor
         return data, meta
 
 
-
-
-class ParticleInFineField(ParticleInField) :
-
-    def __init__(self, position, speed, orientation, noise, boxSize, finess=4) :
-        ParticleInField.__init__(self, position, speed, orientation, noise, boxSize)
-        self.finess = finess
-        return
 
 
 ## executable code

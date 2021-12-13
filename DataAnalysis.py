@@ -21,19 +21,6 @@ import os
 
 
 
-class Histogram:
-
-    def __init__(self, x_min, x_max, n_bins):
-        self.x_min, self.x_max = x_min, x_max
-        self.x_values, self.delta = np.linspace(x_min, x_max, n_bins, retstep=True)
-        self.y_values = np.zeros(len(self.x_values))
-        self.n_values = 0
-
-    def __lshift__(self, value):
-        ind = np.int((value-self.x_min)/self.delta)
-        if (ind >= 0) and (ind < len(self.x_values)):
-            self.y_values[np.int((value-self.x_min)/self.delta)] += 1
-            self.n_values += 1
 
 def histoTheta(data, meta, n_bins, accu) :
     """returns the histograms (for each timestep) of thetas"""
@@ -65,6 +52,50 @@ def histoTheta(data, meta, n_bins, accu) :
     return counters
 
 
+
+
+
+def histoDist(data, meta, n_bins, accu) :
+    """returns the histograms (for each timestep) of thetas"""
+
+    N = int(meta[0])
+    n_step = int(meta[4])
+    L = meta[1]
+
+    counters = np.zeros((n_step, n_bins))
+    #dr = L/(np.sqrt(2)*n_bins)
+    dr=L/n_bins
+
+    if not accu :
+        for t in range(n_step) :
+            for p in range(N) :
+                for q in range(p+1,N) :
+                    delta = np.abs(data[t,p,0:2]-data[t,q,0:2])
+                    delta[0] = min(delta[0], L-delta[0]) # taking into account the peridodic boundary condition...
+                    delta[1] = min(delta[1], L-delta[1]) # ...using the minimum
+                    dist = np.linalg.norm(delta)
+                    if dist > L :
+                        print('ERROR dist>L')
+                        print(L)
+                        print(t,data[t,p,0:2],data[t,q,0:2], dist, dist/dr, n_bins)
+                    ind = int(dist/dr)
+                    counters[t,ind] += 2/(N*(N-1))
+    else :
+        for t in range(n_step) :
+            if t>0 :
+                counters[t,:] += counters[t-1,:]
+            for p in range(N) :
+                for q in range(p+1,N) :
+                    delta = data[t,p,0:2]-data[t,q,0:2]
+                    delta[0] = min(delta[0], self.L-delta[0]) # taking into account the peridodic boundary condition...
+                    delta[1] = min(delta[1], self.L-delta[1]) # ...using the minimum
+                    dist = np.linalg.norm(delta)
+                    ind = int(dist/dr)
+                    counters[t,ind] += 1
+        for t in range(n_step) :
+            counters[t,:] = 2*counters[t,:]/((t+1)*N*(N-1))
+
+    return counters
 
 
 def averageVelocity(data, meta, cut=0):
