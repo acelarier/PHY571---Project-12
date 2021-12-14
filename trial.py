@@ -98,8 +98,8 @@ save the results in the specified path"""
 
     #metas = np.array(tmp)
     #metas = np.array([[100, 5, (i+1), 0.03, 10000] for i in range(5)])
-    #metas = np.array([[40, 3.1, (i+1), 0.03, 10000] for i in range(5)])
-    metas = np.array([[10, 3.1, 0.1, 0.03, 1000] for i in range(1)])
+    metas = np.array([[100, 5, 5*(i+1)/30, 0.03, 1000] for i in range(30)])
+    #metas = np.array([[10, 3.1, 0.1, 0.03, 1000] for i in range(1)])
     #metas = np.array([[300, 25, 0.1, 0.03, 1000],
     #                  [300, 7,  2,   0.03, 1000],
     #                  [300, 5,  0.1, 0.03, 1000]])
